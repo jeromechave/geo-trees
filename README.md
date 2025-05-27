@@ -1,28 +1,34 @@
-# Tiny Vue App
+# Geo Trees website
 
-This is a boilerplate for tiny Vue App with global data import
+This is the repository for the Geo Trees website
 
-## Project setup
-```
-npm install
-```
+## How to upload a new image
 
-### Compiles and hot-reloads for development
 ```
-npm run serve
+Click on Master and select the gh-pages branch
 ```
 
-### Compiles and minifies for production
 ```
-npm run build
-if the app is not hosted on root, edit publicPath in vue.config.js
+Click on Add file
 ```
 
-### Lints and fixes files
+
 ```
-npm run lint
+Select Upload Files
 ```
 
-### Notes
+```
+Drag and drop the new image
+```
 
-Webpack should be install with npm install webpack@^4.0.0 --save-dev
+```
+Click on Commit change (the option Commit directly to the gh-pages branch should be selected)
+```
+
+```
+The new file should be visible on the gh-pages root repository
+```
+
+```
+To make sur the deployement is done, go to Settings and then Pages and check out Last deployed date
+```
