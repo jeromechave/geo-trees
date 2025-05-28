@@ -44,10 +44,10 @@
                       <span class="site-details-item-label">Supporting Institutions: </span>
                       <a class="site-details-item-value" v-for="Institutions_Names,i in site.PI_Institutions_Names" :key="Institutions_Names" :href="site.Support_Institutions_websites[i]" target="_blank">{{ Institutions_Names }}</a>
                     </div>
-                    <div class="site-details-item-row" v-if="site.Funders.length>0">
+                    <!-- <div class="site-details-item-row" v-if="site.Funders.length>0">
                       <span class="site-details-item-label">Funders: </span>
                       <span class="site-details-item-value" v-for="Funders in site.Funders" :key="Funders">{{ Funders }}</span>
-                    </div>
+                    </div -->
                     <div class="site-details-item-row" v-if="site.Partners_Names.length>0">
                       <span class="site-details-item-label">Partners Names: </span>
                       <span class="site-details-item-value" v-for="Names in site.Partners_Names" :key="Names">{{ Names }}</span>

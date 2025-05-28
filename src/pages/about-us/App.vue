@@ -57,7 +57,7 @@
           </div>
 
           <h2>Network Partners</h2>
-          <div class="partners-logo-list">
+          <div class="partners-logo-list x-small-logo">
             <a class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="member.image"/></a>
           </div>
 
@@ -68,7 +68,7 @@
           </div>
 
           <h2>Supporting Partners</h2>
-          <div class="partners-logo-list small-logo">
+          <div class="partners-logo-list x-small-logo">
             <a class="partner-logo" v-for="member in supportingPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="member.image"/></a>
           </div>
 
