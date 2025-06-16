@@ -14,15 +14,7 @@
       <div class="content-section section-light">
         <div class="content-wrapper">
           <h2>Data Sharing</h2>
-          <span class="default-text">The following data collected by the GEO-TREES project is publicly accessible through the GEO-TREES web portal:
-            <ul>
-              <li>0.25 ha aboveground biomass estimates and uncertainty for each tree inventory subplot;</li>
-              <li>1-m canopy height estimates and uncertainty for each ALS-surveyed site;</li>
-              <li>0.25 ha aboveground biomass estimates and uncertainty inferred from ALS and tree inventory over the landscape.</li>
-            </ul>
-            <br/>
-            The data sharing agreement should be consulted before downloading the data on the GEO-TREES web portal. </span><br/>
-          <span class="default-text">To deliver these high-quality data over a sustained period in dozens of countries requires skilled teams hosted by institutional partners. The labor and skill demanded for the groundwork are high, and conditions of work are often insecure and difficult.</span>
+          <span class="default-text">The data collected by the GEO-TREES project is publicly accessible through the GEO-TREES web portal. The data sharing agreement should be consulted before downloading the data on the GEO-TREES web portal. For more information please download the <a href="GEOTREES_TermsConditions_1.2.pdf" download>Terms and Conditions</a>.</span>
         </div>
       </div>
 
