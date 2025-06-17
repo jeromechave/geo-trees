@@ -21,7 +21,7 @@
         <div class="content-wrapper">
           <h2>What are the measurement requirements to obtain this high quality data?</h2>
           <span class="default-text">Core BRM sites meet the following measurement requirements:</span>
-          <img class="center" src="illustration-synthese@2x.png"/>
+          <img class="center" src="../../assets/illustration-synthese@2x.png"/>
           <span class="default-text">GEO-TREES sites will follow the Committee on Earth Observation Satellites Land Product Validation (CEOS LPV) biomass protocol that was written by the Earth Observation and ecological communities. This document represents the current state of knowledge and data gaps for operational validation of satellite products on a global scale. The focus lies on standardized intercomparison and validation across products from different satellite, algorithms, and agency sources.</span>
         </div>
       </div>
@@ -42,23 +42,23 @@
 
       <div class="content-section section-light">
         <div class="content-wrapper">
-          <img class="center" src="illustration-forest-plot-inventory@2x.png"/>
+          <img class="center" src="../../assets/illustration-forest-plot-inventory@2x.png"/>
           <span class="cartouche-text">ON THE GROUND</span>
           <div class="img-carroussel">
             <div class="img-carroussel-item">
-              <img src="15_Measuring_Amazon_trees_Peru_byRoelBrienen.jpg"/>
+              <img src="../../assets/15_Measuring_Amazon_trees_Peru_byRoelBrienen.jpg"/>
               <span class="img-carroussel-text">Roel Brienen, Amazon rainforest, Peru</span>
             </div>
             <div class="img-carroussel-item">
-              <img src="Andean_cloud_forest_collecting_JakeBryant.jpg"/>
+              <img src="../../assets/Andean_cloud_forest_collecting_JakeBryant.jpg"/>
               <span class="img-carroussel-text">Jake Bryant, Andean cloud forest, Peru</span>
             </div>
             <div class="img-carroussel-item">
-              <img src="Colombia_measuring_giant_Ceiba_in_the_Choco_rainforest_2_PaulineKindler.jpg"/>
+              <img src="../../assets/Colombia_measuring_giant_Ceiba_in_the_Choco_rainforest_2_PaulineKindler.jpg"/>
               <span class="img-carroussel-text">Pauline Kindler, Chocó rainforest, Colombia</span>
             </div>
             <div class="img-carroussel-item">
-              <img src="Inventaire_sol.jpg"/>
+              <img src="../../assets/Inventaire_sol.jpg"/>
               <span class="img-carroussel-text">Iris-Amata Dion,  Paracou Forest French Guina</span>
             </div>
           </div>
@@ -77,11 +77,11 @@
 
       <div class="content-section section-light">
         <div class="content-wrapper">
-          <img class="center" src="illustration-airborne-laser-scanning@2x.png"/>
+          <img class="center" src="../../assets/illustration-airborne-laser-scanning@2x.png"/>
           <span class="cartouche-text">ON THE GROUND</span>
           <div class="img-carroussel">
             <div class="img-carroussel-item">
-              <img src="Screenshot-2024-03-11-at-10.53.jpg"/>
+              <img src="../../assets/Screenshot-2024-03-11-at-10.53.jpg"/>
             </div>
           </div>
         </div>
@@ -99,16 +99,16 @@
 
       <div class="content-section section-light">
         <div class="content-wrapper">
-          <img class="center" src="illustration-terrestial-laser-scanning@2x.png"/>
+          <img class="center" src="../../assets/illustration-terrestial-laser-scanning@2x.png"/>
           <span class="cartouche-text">ON THE GROUND</span>
           <div class="img-carroussel">
             <div class="img-carroussel-item video-item">
               <svg width="138" height="138" viewBox="0 0 138 138" fill="none" xmlns="http://www.w3.org/2000/svg"><path id="Subtract" opacity="0.9" fill-rule="evenodd" clip-rule="evenodd" d="M69 138C107.108 138 138 107.108 138 69C138 30.8924 107.108 0 69 0C30.8924 0 0 30.8924 0 69C0 107.108 30.8924 138 69 138ZM49.25 107.971L110 69L49.25 30.0289L49.25 107.971Z" fill="#C0D8A4"/></svg>
-              <a href="https://player.vimeo.com/video/945828370?rel=0" target="_blank"><img src="thumbnail-TLS_video1@2x.png"/></a>
+              <a href="https://player.vimeo.com/video/945828370?rel=0" target="_blank"><img src="../../assets/thumbnail-TLS_video1@2x.png"/></a>
             </div>
             <div class="img-carroussel-item video-item">
               <svg width="138" height="138" viewBox="0 0 138 138" fill="none" xmlns="http://www.w3.org/2000/svg"><path id="Subtract" opacity="0.9" fill-rule="evenodd" clip-rule="evenodd" d="M69 138C107.108 138 138 107.108 138 69C138 30.8924 107.108 0 69 0C30.8924 0 0 30.8924 0 69C0 107.108 30.8924 138 69 138ZM49.25 107.971L110 69L49.25 30.0289L49.25 107.971Z" fill="#C0D8A4"/></svg>
-              <a href="https://www.youtube.com/watch?v=PPORer0aOVM&t=42s" target="_blank"><img src="thumbnail-TLS2@2x.png"/></a>
+              <a href="https://www.youtube.com/watch?v=PPORer0aOVM&t=42s" target="_blank"><img src="../../assets/thumbnail-TLS2@2x.png"/></a>
             </div>
           </div>
         </div>

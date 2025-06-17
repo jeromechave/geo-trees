@@ -13,7 +13,7 @@
       <div class="content-section section-light">
         <div class="content-wrapper">
           <h2>Governance</h2>
-          <img class="center" src="governance-image-2.png"/>
+          <img class="center" src="../../assets/governance-image-2.png"/>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in executiveBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="(member.name=='Camille Piponiot'?'zoom':'')" :src="member.image"/>
+                <img :class="(member.name=='Camille Piponiot'?'zoom':'')" :src="'/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span class="team-member-role">{{member.role}}</span>
@@ -36,7 +36,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in projectManager" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image no-border">
-                <img :src="member.image"/>
+                <img :src="'/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span class="team-member-role">{{member.role}}</span>
@@ -48,7 +48,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="member.image"/>
+                <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="'/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span class="team-member-role">{{member.role}}</span>
@@ -58,18 +58,18 @@
 
           <h2>Network Partners</h2>
           <div class="partners-logo-list x-small-logo">
-            <a class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="member.image"/></a>
+            <a class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="'/geo-trees/img/'+member.image"/></a>
           </div>
 
           <h2>Site Partners</h2>
-          <a href="https://geo-trees.org/sites/">More information about the sites</a>
+          <a href="https://geo-trees.org/sites.html">More information about the sites</a>
           <div class="partners-logo-list x-small-logo">
-            <a class="partner-logo" v-for="member in sitePartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="member.image"/></a>
+            <a class="partner-logo" v-for="member in sitePartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="'/geo-trees/img/'+member.image"/></a>
           </div>
 
           <h2>Supporting Partners</h2>
           <div class="partners-logo-list x-small-logo">
-            <a class="partner-logo" v-for="member in supportingPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="member.image"/></a>
+            <a class="partner-logo" v-for="member in supportingPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="'/geo-trees/img/'+member.image"/></a>
           </div>
 
         </div>

@@ -17,7 +17,7 @@
             </span>
           </div>
           <div class="homepage-intro">
-            <span>The Terms of Reference of the GEO-TREES initiative are available <a href="https://geo-trees.org/about-us/" target="_blank">here</a>.</span>
+            <span>The Terms of Reference of the GEO-TREES initiative are available <a href="https://geo-trees.org/about-us.html">here</a>.</span>
           </div>
           <div class="homepage-intro">
             <span>GEO-TREES implements the recommendations of the <a href="https://lpvs.gsfc.nasa.gov/AGB/AGB_home.html" target="_blank">CEOS Aboveground Biomass Land Product Validation protocol</a>.</span>
