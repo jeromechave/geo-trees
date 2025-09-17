@@ -29,6 +29,27 @@ export const getData = async function (store) {
       })
 	}
 
+	export const getNewsData = async function (store) {
+	
+		return axios.get("https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538/values:batchGet?ranges=news!A2:K10000&key=AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0")
+		  .then(response => {
+			const values = response.data.valueRanges[0].values;
+			var allItems = []
+			_.each(values,function(item){
+				var itemObj = {}
+				itemObj.date = item[0]
+				itemObj.title = item[1]
+				itemObj.text = item[2]
+				itemObj.link = item[3]
+				allItems.push(itemObj)
+			})
+			
+			store.commit('initializeNewsData',allItems)
+			store.commit("endImport",true)
+			return true 
+		  })
+		}
+
 	export const getSitesData = async function (store) {
 	
 		return axios.get("https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538/values:batchGet?ranges=Sitesdirectory!A2:N10000&key=AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0")

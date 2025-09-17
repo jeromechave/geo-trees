@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     aboutData:undefined,
     sitesData:undefined,
+    newsData:undefined,
     endImport:false
   },
   mutations: {
@@ -15,6 +16,9 @@ export default new Vuex.Store({
     },
     initializeSitesData (state,data) {
       state.sitesData = data
+    },
+    initializeNewsData (state,data) {
+      state.newsData = data
     },
     endImport(state,value){
       state.endImport = value

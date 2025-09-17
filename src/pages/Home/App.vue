@@ -22,6 +22,13 @@
           <div class="homepage-intro">
             <span>GEO-TREES implements the recommendations of the <a href="https://lpvs.gsfc.nasa.gov/AGB/AGB_home.html" target="_blank">CEOS Aboveground Biomass Land Product Validation protocol</a>.</span>
           </div>
+          <h3 class="news-title">News</h3>
+          <div class="news-item" v-for="news in newsData" :key="news.title">
+            <div class="news-item-date">{{ news.date }}</div>
+            <div class="news-item-title">{{ news.title }}</div>
+            <div class="news-item-text">{{ news.text }}</div>
+            <div class="news-item-link"><a :href="news.link" target="_blank">Read more</a></div>
+          </div>
         </div>
       </div>
     </div>
@@ -31,6 +38,8 @@
 <script>
 
 import Header from '@/components/header.vue'
+import store from '@/store'
+import { getNewsData } from '@/import'
 
 export default {
   name: 'Homepage',
@@ -39,13 +48,16 @@ export default {
   },
 
   computed: {
+    newsData(){  
+      return store.state.newsData
+    },
   },
 
   watch:{
   },
   
   created(){
-    
+    getNewsData(store)
   }
 }
 </script>
@@ -79,7 +91,8 @@ export default {
       .content-wrapper{
         position: relative;
         z-index: 1;
-        text-align: center;
+        text-align: left;
+        
         h1{
           color: #fff;
           display: block;
@@ -111,6 +124,55 @@ export default {
               text-decoration: none;
             }
           }
+        }
+      }
+      .news-title{
+        display: inline-block;
+        text-align: left;
+        font-size: 35px;
+        color: #213043;
+        font-family: "Lato-Bold";
+        padding: 10px 20px;
+        line-height: 35px;
+        margin-bottom: 10px;
+        margin-top: 25px;
+      }
+      .news-item{
+        display: inline-block;
+        text-align: left;
+        padding: 10px 20px;
+        .news-item-date{
+          font-size: 16px;
+          color: #213043;
+          font-family: "Lato-Regular";
+          margin-bottom: 10px;
+        }
+      }
+      .news-item-title{
+        font-size: 20px;
+        color: #213043;
+        font-family: "Lato-Bold";
+        margin-bottom: 5px;
+      }
+      .news-item-text{
+        font-size: 20px;
+        color: #213043;
+        font-family: "Lato-Regular";
+        margin-bottom: 10px;
+        line-height: 35px;
+        display: inline;
+      }
+      .news-item-link{
+        font-size: 20px;
+        color: #213043;
+        font-family: "Lato-Regular";
+        margin-bottom: 10px;
+        display: inline;
+        margin-left: 5px;
+        a{
+          color: #53A034;
+          text-decoration: none;
+          display: inline;
         }
       }
     }
