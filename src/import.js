@@ -40,7 +40,8 @@ export const getData = async function (store) {
 				itemObj.date = item[0]
 				itemObj.title = item[1]
 				itemObj.text = item[2]
-				itemObj.link = item[3]
+				itemObj.link_text = item[3].split(';')
+				itemObj.link_url = item[4].split(';')
 				allItems.push(itemObj)
 			})
 			

@@ -22,12 +22,18 @@
           <div class="homepage-intro">
             <span>GEO-TREES implements the recommendations of the <a href="https://lpvs.gsfc.nasa.gov/AGB/AGB_home.html" target="_blank">CEOS Aboveground Biomass Land Product Validation protocol</a>.</span>
           </div>
+        </div>
+      </div>
+      <div class="content-section news-section">
+        <div class="content-wrapper">
           <h3 class="news-title">News</h3>
           <div class="news-item" v-for="news in newsData" :key="news.title">
             <div class="news-item-date">{{ news.date }}</div>
             <div class="news-item-title">{{ news.title }}</div>
             <div class="news-item-text">{{ news.text }}</div>
-            <div class="news-item-link"><a :href="news.link" target="_blank">Read more</a></div>
+            <div class="news-item-link">
+              <a v-for="link_text,i in news.link_text" :key="link_text" :href="news.link_url[i]" target="_blank">{{ link_text }}</a>
+            </div>
           </div>
         </div>
       </div>
@@ -72,6 +78,10 @@ export default {
     background-color: #f4f7e4;
     .content-section{
       position: relative;
+      &.news-section{
+        background-color: #fff;
+        padding-top: 0px;
+      }
       &.homepage-banner{
         background-image: url("../../assets/homepage-background.jpg");
         background-size: cover;
@@ -92,7 +102,6 @@ export default {
         position: relative;
         z-index: 1;
         text-align: left;
-        
         h1{
           color: #fff;
           display: block;
@@ -135,12 +144,11 @@ export default {
         padding: 10px 20px;
         line-height: 35px;
         margin-bottom: 10px;
-        margin-top: 25px;
       }
       .news-item{
         display: inline-block;
         text-align: left;
-        padding: 10px 20px;
+        padding: 20px 20px;
         .news-item-date{
           font-size: 16px;
           color: #213043;
@@ -152,7 +160,7 @@ export default {
         font-size: 20px;
         color: #213043;
         font-family: "Lato-Bold";
-        margin-bottom: 5px;
+        margin-bottom: 15px;
       }
       .news-item-text{
         font-size: 20px;
@@ -168,11 +176,11 @@ export default {
         font-family: "Lato-Regular";
         margin-bottom: 10px;
         display: inline;
-        margin-left: 5px;
         a{
           color: #53A034;
           text-decoration: none;
           display: inline;
+          margin-left: 10px;
         }
       }
     }

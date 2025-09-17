@@ -7,7 +7,7 @@
         <div class="content-wrapper">
           <h1>Contact</h1>
           <span class="default-text">If you are a potential partner and would like to get in touch with us, please fill <a target="_blank" href="https://docs.google.com/forms/d/12L34uFxsfd5fSwww2e-IG6tytRshdQn0YhG44Xel7U8/viewform?edit_requested=true&pli=1">this form.</a></span>
-          <span class="default-text">For any other request, you can contact us <a href="mailto:contact.geotrees@gmail.com">by email</a>.</span>
+          <span class="default-text">For any other request, you can contact us <a href="mailto:contact@geo-trees.org">by email</a>.</span>
         </div>
       </div>
 
