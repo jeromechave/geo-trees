@@ -26,10 +26,10 @@
       </div>
       <div class="content-section news-section">
         <div class="content-wrapper">
-          <h3 class="news-title">News</h3>
+          <h3 class="news-title">NEWS</h3>
           <div class="news-item" v-for="news in newsData" :key="news.title">
-            <div class="news-item-date">{{ news.date }}</div>
             <div class="news-item-title">{{ news.title }}</div>
+            <div class="news-item-date">{{ news.date }}</div>
             <div class="news-item-text">{{ news.text }}</div>
             <div class="news-item-link">
               <a v-for="link_text,i in news.link_text" :key="link_text" :href="news.link_url[i]" target="_blank">{{ link_text }}</a>
