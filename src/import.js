@@ -51,6 +51,31 @@ export const getData = async function (store) {
 		  })
 		}
 
+		export const getOpportunitiesData = async function (store) {
+	
+			return axios.get("https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538/values:batchGet?ranges=opportunities!A2:K10000&key=AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0")
+			  .then(response => {
+				const values = response.data.valueRanges[0].values;
+				var allItems = []
+				_.each(values,function(item){
+					var itemObj = {}
+					itemObj.categorie = item[0]
+					itemObj.date = item[1]
+					itemObj.title = item[2]
+					itemObj.text = item[3]
+					itemObj.link_text = item[4].split(';')
+					itemObj.link_url = item[5].split(';')
+					allItems.push(itemObj)
+				})
+
+				allItems = _.groupBy(allItems, 'categorie')
+				
+				store.commit('initializeOpportunitiesData',allItems)
+				store.commit("endImport",true)
+				return true 
+			  })
+			}
+
 	export const getSitesData = async function (store) {
 	
 		return axios.get("https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538/values:batchGet?ranges=Sitesdirectory!A2:N10000&key=AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0")

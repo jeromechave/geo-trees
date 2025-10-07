@@ -14,6 +14,7 @@
       <a :class="pathName === 'sites.html' ? 'active' : ''" :href="dynamicPath + '/sites.html'">SITES</a>
       <a :class="pathName === 'data.html' ? 'active' : ''" :href="dynamicPath + '/data.html'">DATA</a>
       <a :class="pathName === 'contact.html' ? 'active' : ''" :href="dynamicPath + '/contact.html'">CONTACT</a>
+      <a :class="pathName === 'opportunities.html' ? 'active' : ''" :href="dynamicPath + '/opportunities.html'">OPPORTUNITIES</a>
     </div>
   </div>
 </template>
@@ -197,7 +198,7 @@ export default {
       padding: 0;
       transition: height 0.3s ease-in-out;
       &.open{
-        height: 250px;
+        height: 290px;
       }
       a{
         margin: 10px 0px;

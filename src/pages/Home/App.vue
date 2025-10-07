@@ -131,6 +131,9 @@ export default {
             a{
               color: #53A034;
               text-decoration: none;
+              &:hover{
+                text-decoration: underline;
+              }
             }
           }
         }
@@ -181,6 +184,9 @@ export default {
           text-decoration: none;
           display: inline;
           margin-left: 10px;
+          &:hover{
+            text-decoration: underline;
+          }
         }
       }
     }

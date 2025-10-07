@@ -30,6 +30,11 @@ module.exports = {
       entry: './src/pages/contact/main.js',
       title: 'Contact',
       filename: 'contact.html'
+    },
+    'opportunities':{
+      entry: './src/pages/opportunities/main.js',
+      title: 'Opportunities',
+      filename: 'opportunities.html'
     }
   },
   configureWebpack: {
