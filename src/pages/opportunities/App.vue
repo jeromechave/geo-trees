@@ -6,14 +6,14 @@
       <div class="content-section section-dark">
         <div class="content-wrapper">
           <h1>Opportunities</h1>
-          <span class="default-text">Find news and opportunities for GEO-TREES here.</span>
+          <span class="default-text">Discover GEO-TREES opportunities for research, collaboration, and training.</span>
         </div>
       </div>
 
       <div class="content-section section-light">
         <div class="content-wrapper">
           <h2>Awards & fellowships</h2>
-          <span class="default-text" v-if="!opportunitiesData['awards'] || opportunitiesData['awards'].length==0" >Nothing new for now.</span>
+          <span class="default-text" v-if="!opportunitiesData['awards'] || opportunitiesData['awards'].length==0" >Content forthcoming.</span>
           <div class="opportunities-item" v-for="item in opportunitiesData['awards']" :key="item.title">
             <div class="opportunities-item-title">{{ item.title }}</div>
             <div class="opportunities-item-date">{{ item.date }}</div>
@@ -28,7 +28,7 @@
       <div class="content-section section-white">
         <div class="content-wrapper">
           <h2>Job board</h2>
-          <span class="default-text" v-if="!opportunitiesData['job'] || opportunitiesData['job'].length==0" >Nothing new for now.</span>
+          <span class="default-text" v-if="!opportunitiesData['job'] || opportunitiesData['job'].length==0" >Content forthcoming.</span>
           <div class="opportunities-item" v-for="item in opportunitiesData['job']" :key="item.title">
             <div class="opportunities-item-title">{{ item.title }}</div>
             <div class="opportunities-item-date">{{ item.date }}</div>
@@ -42,8 +42,8 @@
 
       <div class="content-section section-light">
         <div class="content-wrapper">
-          <h2>Workshops & seminar</h2>
-          <span class="default-text" v-if="!opportunitiesData['workshop'] || opportunitiesData['workshop'].length==0" >Nothing new for now.</span>
+          <h2>Workshops & seminars</h2>
+          <span class="default-text" v-if="!opportunitiesData['workshop'] || opportunitiesData['workshop'].length==0" >Content forthcoming.</span>
           <div class="opportunities-item" v-for="item in opportunitiesData['job']" :key="item.title">
             <div class="opportunities-item-title">{{ item.title }}</div>
             <div class="opportunities-item-date">{{ item.date }}</div>
@@ -58,7 +58,7 @@
       <div class="content-section section-white">
         <div class="content-wrapper">
           <h2>News blog</h2>
-          <span class="default-text" v-if="!opportunitiesData['blog'] || opportunitiesData['blog'].length==0" >Nothing new for now.</span>
+          <span class="default-text" v-if="!opportunitiesData['blog'] || opportunitiesData['blog'].length==0" >Content forthcoming.</span>
           <div class="opportunities-item" v-for="item in opportunitiesData['job']" :key="item.title">
             <div class="opportunities-item-title">{{ item.title }}</div>
             <div class="opportunities-item-date">{{ item.date }}</div>
