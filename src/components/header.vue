@@ -199,7 +199,7 @@ export default {
       padding: 0;
       transition: height 0.3s ease-in-out;
       &.open{
-        height: 290px;
+        height: 320px;
       }
       a{
         margin: 10px 0px;
