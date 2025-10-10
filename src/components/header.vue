@@ -15,6 +15,7 @@
       <a :class="pathName === 'data.html' ? 'active' : ''" :href="dynamicPath + '/data.html'">DATA</a>
       <a :class="pathName === 'contact.html' ? 'active' : ''" :href="dynamicPath + '/contact.html'">CONTACT</a>
       <a :class="pathName === 'opportunities.html' ? 'active' : ''" :href="dynamicPath + '/opportunities.html'">OPPORTUNITIES</a>
+      <a :class="pathName === 'news.html' ? 'active' : ''" :href="dynamicPath + '/news.html'">NEWS</a>
     </div>
   </div>
 </template>

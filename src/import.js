@@ -42,6 +42,7 @@ export const getData = async function (store) {
 				itemObj.text = item[2]
 				itemObj.link_text = item[3].split(';')
 				itemObj.link_url = item[4].split(';')
+				itemObj.img_url = item[5]
 				allItems.push(itemObj)
 			})
 			

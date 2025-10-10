@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <div class="content-section news-section">
+      <!-- <div class="content-section news-section">
         <div class="content-wrapper">
           <h3 class="news-title">NEWS</h3>
           <div class="news-item" v-for="news in newsData" :key="news.title">
@@ -36,7 +36,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -44,8 +44,8 @@
 <script>
 
 import Header from '@/components/header.vue'
-import store from '@/store'
-import { getNewsData } from '@/import'
+// import store from '@/store'
+//import { getNewsData } from '@/import'
 
 export default {
   name: 'Homepage',
@@ -54,16 +54,16 @@ export default {
   },
 
   computed: {
-    newsData(){  
+    /*newsData(){  
       return store.state.newsData
-    },
+    },*/
   },
 
   watch:{
   },
   
   created(){
-    getNewsData(store)
+    //getNewsData(store)
   }
 }
 </script>

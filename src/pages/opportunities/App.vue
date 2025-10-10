@@ -55,22 +55,6 @@
         </div>
       </div>
 
-      <div class="content-section section-white">
-        <div class="content-wrapper">
-          <h2>News blog</h2>
-          <span class="default-text" v-if="!opportunitiesData['blog'] || opportunitiesData['blog'].length==0" >Content forthcoming.</span>
-          <div class="opportunities-item" v-for="item in opportunitiesData['job']" :key="item.title">
-            <div class="opportunities-item-title">{{ item.title }}</div>
-            <div class="opportunities-item-date">{{ item.date }}</div>
-            <div class="opportunities-item-text">{{ item.text }}</div>
-            <div class="opportunities-item-link">
-              <a v-for="link_text,i in item.link_text" :key="link_text" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
     </div>
   </div>
 </template>
@@ -95,16 +79,8 @@ export default {
     },
   },
 
-  watch:{
-    opportunitiesData(newVal){
-      console.log(newVal)
-    }
-  },
-  
   created(){
-
     getOpportunitiesData(store)
-  
   }
 }
 </script>
@@ -116,7 +92,7 @@ export default {
 
 #app {
   #content{
-    background-color: #ffffff;
+    background-color: #f4f7e4;
     .content-section{
       .content-wrapper{
         .opportunities-item{
