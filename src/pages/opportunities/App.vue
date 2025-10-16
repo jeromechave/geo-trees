@@ -40,20 +40,6 @@
         </div>
       </div>
 
-      <div class="content-section section-light">
-        <div class="content-wrapper">
-          <h2>Workshops & seminars</h2>
-          <span class="default-text" v-if="!opportunitiesData['workshop'] || opportunitiesData['workshop'].length==0" >Content forthcoming.</span>
-          <div class="opportunities-item" v-for="item in opportunitiesData['workshop']" :key="item.title">
-            <div class="opportunities-item-title">{{ item.title }}</div>
-            <div class="opportunities-item-date">{{ item.date }}</div>
-            <div class="opportunities-item-text">{{ item.text }}</div>
-            <div class="opportunities-item-link">
-              <a v-for="link_text,i in item.link_text" :key="link_text" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>
