@@ -12,7 +12,6 @@
 
       <div class="content-section section-light">
         <div class="content-wrapper">
-          <span class="default-text" v-if="!news || news.length==0" >Content forthcoming.</span>
           <div class="news-item" v-for="news in newsData" :key="news.title">
             <div class="news-item-image">
               <img :src="news.img_url" alt="News image"/>
