@@ -16,7 +16,14 @@
       <a :class="pathName === 'contact.html' ? 'active' : ''" :href="dynamicPath + '/contact.html'">CONTACT</a>
       <a :class="pathName === 'opportunities.html' ? 'active' : ''" :href="dynamicPath + '/opportunities.html'">OPPORTUNITIES</a>
       <a :class="pathName === 'news.html' ? 'active' : ''" :href="dynamicPath + '/news.html'">NEWS</a>
+      <a class="social-link" href="https://www.linkedin.com/company/geo-trees/" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M512 96L127.9 96C110.3 96 96 110.5 96 128.3L96 511.7C96 529.5 110.3 544 127.9 544L512 544C529.6 544 544 529.5 544 511.7L544 128.3C544 110.5 529.6 96 512 96zM231.4 480L165 480L165 266.2L231.5 266.2L231.5 480L231.4 480zM198.2 160C219.5 160 236.7 177.2 236.7 198.5C236.7 219.8 219.5 237 198.2 237C176.9 237 159.7 219.8 159.7 198.5C159.7 177.2 176.9 160 198.2 160zM480.3 480L413.9 480L413.9 376C413.9 351.2 413.4 319.3 379.4 319.3C344.8 319.3 339.5 346.3 339.5 374.2L339.5 480L273.1 480L273.1 266.2L336.8 266.2L336.8 295.4L337.7 295.4C346.6 278.6 368.3 260.9 400.6 260.9C467.8 260.9 480.3 305.2 480.3 362.8L480.3 480z"/></svg>
+      </a>
+      <a class="social-link" href="https://x.com/GEO_TREES" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><path d="M453.2 112L523.8 112L369.6 288.2L551 528L409 528L297.7 382.6L170.5 528L99.8 528L264.7 339.5L90.8 112L236.4 112L336.9 244.9L453.2 112zM428.4 485.8L467.5 485.8L215.1 152L173.1 152L428.4 485.8z"/></svg>
+      </a>
     </div>
+    
   </div>
 </template>
 
@@ -93,6 +100,7 @@ export default {
     align-items: center;
     justify-content: center;
     height: 100%;
+    cursor: pointer;
     a{
       margin: 0 15px;
       font-family: "Lato-Bold";
@@ -136,6 +144,19 @@ export default {
         &:before{
           opacity: 1;
         }
+      }
+    }
+    .social-link{
+      color:red;
+      margin:0 0 0 10px;
+      svg{
+        width: 30px;
+        height: auto;
+        fill: #213043;
+        transform: translateY(2px);
+      }
+      &:after{
+        display: none;
       }
     }
   }
@@ -199,7 +220,7 @@ export default {
       padding: 0;
       transition: height 0.3s ease-in-out;
       &.open{
-        height: 320px;
+        height: 440px;
       }
       a{
         margin: 10px 0px;
@@ -216,6 +237,9 @@ export default {
             opacity: 0;
           }
         }
+      }
+      .social-link{
+        margin:0 0 0 0;
       }
     }
     #header-menu-button{
