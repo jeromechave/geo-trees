@@ -27,8 +27,8 @@
                 <img :class="(member.name=='Camille Piponiot'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
-              <span class="team-member-role">{{member.role}}</span>
-              <span class="team-member-affiliation">{{member.affiliation}}</span>
+              <span  v-if="member.role" class="team-member-role">{{member.role}}</span>
+              <span  v-if="member.affiliation" class="team-member-affiliation">{{member.affiliation}}</span>
             </div>
           </div>
 
@@ -59,6 +59,18 @@
           <h2>Network Partners</h2>
           <div class="partners-logo-list x-small-logo">
             <a class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="'https://geo-trees.org/geo-trees/img/'+member.image"/></a>
+          </div>
+
+          <h2>Community</h2>
+          <div class="community-member-list">
+            <div class="community-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
+              <div class="community-member-image">
+                <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+              </div>
+              <h3>{{member.name}}</h3>
+              <span v-if="member.role" class="community-member-role">{{member.role}}</span>
+              <span v-if="member.affiliation" class="community-member-affiliation">{{member.affiliation}}</span>
+            </div>
           </div>
 
           <h2>Site Partners</h2>
@@ -196,6 +208,70 @@ export default {
             margin-bottom: 5px;
           }
         }
+        .community-member-list{
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px 0px;
+          padding-top: 0px;
+          margin-bottom: 100px;
+          .community-member{
+            width: 100%;
+            border-bottom: 1px solid rgba(83, 160, 52, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+          }
+          .community-member-image{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            box-sizing: border-box;
+            &.no-border{
+              border:none;
+            }
+            img{
+              width: 100%;
+              height: auto;
+              position: absolute;
+              left:50%;
+              top:50%;
+              transform: translate(-50%, -50%);
+              &.zoom{
+                width: 75px;
+              }
+            }
+          }
+          h3{
+            font-family: "Lato-Bold";
+            font-size: 20px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            &:after{
+              content: '·';
+              margin-left: 10px;
+            }
+          }
+          span{
+            display: block;
+            font-family: "Lato-Regular";
+            font-size: 18px;
+            margin-top: 12px;
+            &:after{
+              content: '·';
+              margin-left: 10px;
+            }
+            &:last-child{
+              &:after{
+                display: none;
+              }
+            }
+          }
+        }
         .partners-logo-list{
           display: flex;
           flex-wrap: wrap;
@@ -266,6 +342,17 @@ export default {
           padding-top: 20px;
           .team-member{
             width: 50%;
+          }
+          h3{
+            font-size: 18px;
+          }
+          span{
+            font-size: 16px;
+          }
+        }
+        .community-member-list{
+          .community-member-image{
+            display: none;
           }
           h3{
             font-size: 18px;
