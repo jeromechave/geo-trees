@@ -212,24 +212,21 @@ export default {
           width: 100%;
           display: flex;
           flex-wrap: wrap;
-          gap: 10px 0px;
-          padding-top: 0px;
+          gap: 20px 0px;
+          padding-top: 20px;
           margin-bottom: 100px;
           .community-member{
-            width: 100%;
-            border-bottom: 1px solid rgba(83, 160, 52, 0.3);
-            padding-bottom: 10px;
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
+            width: 19.5%;
+            text-align: center;
           }
           .community-member-image{
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            display: inline-block;
+            margin: 0 auto;
+            border:3px solid #53A034;
             box-sizing: border-box;
             &.no-border{
               border:none;
@@ -242,34 +239,21 @@ export default {
               top:50%;
               transform: translate(-50%, -50%);
               &.zoom{
-                width: 75px;
+                width: 150px;
               }
             }
           }
           h3{
             font-family: "Lato-Bold";
-            font-size: 20px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            &:after{
-              content: '·';
-              margin-left: 10px;
-            }
+            font-size: 18px;
+            margin-top: 5px;
+            margin-bottom: 5px;
           }
           span{
             display: block;
             font-family: "Lato-Regular";
-            font-size: 18px;
-            margin-top: 12px;
-            &:after{
-              content: '·';
-              margin-left: 10px;
-            }
-            &:last-child{
-              &:after{
-                display: none;
-              }
-            }
+            font-size: 16px;
+            margin-bottom: 5px;
           }
         }
         .partners-logo-list{
@@ -351,14 +335,10 @@ export default {
           }
         }
         .community-member-list{
-          .community-member-image{
-            display: none;
-          }
-          h3{
-            font-size: 18px;
-          }
-          span{
-            font-size: 16px;
+          gap: 20px 0px;
+          padding-top: 20px;
+          .community-member{
+            width: 33%;
           }
         }
         .partners-logo-list{
