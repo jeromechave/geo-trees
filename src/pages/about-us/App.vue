@@ -63,7 +63,7 @@
 
           <h2>Community</h2>
           <div class="community-member-list">
-            <div class="community-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
+            <div class="community-member" v-for="member in community" :class="member.group" v-bind:key="member.name">
               <div class="community-member-image">
                 <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
@@ -123,6 +123,9 @@ export default {
     },
     supportingPartners(){
       return this.aboutData.filter(member => member.group === "supporting-partners");
+    },
+    community(){
+      return this.aboutData.filter(member => member.group === "community");
     },
     aboutData(){
       return store.state.aboutData
