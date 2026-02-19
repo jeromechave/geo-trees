@@ -107,25 +107,25 @@ export default {
   },
   computed: {
     executiveBoard(){
-      return this.aboutData.filter(member => member.group === "executive-board" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "executive-board" && member.display === "yes");
     },
     projectManager(){
-      return this.aboutData.filter(member => member.group === "project-manager" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "project-manager" && member.display === "yes");
     },
     scientificBoard(){
-      return this.aboutData.filter(member => member.group === "scientific-board" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "scientific-board" && member.display === "yes");
     },
     networksPartners(){
-      return this.aboutData.filter(member => member.group === "networks-partners" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "networks-partners" && member.display === "yes");
     },
     sitePartners(){
-      return this.aboutData.filter(member => member.group === "site-partners" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "site-partners" && member.display === "yes");
     },
     supportingPartners(){
-      return this.aboutData.filter(member => member.group === "supporting-partners" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "supporting-partners" && member.display === "yes");
     },
     community(){
-      return this.aboutData.filter(member => member.group === "community" && member.display === "oui");
+      return this.aboutData.filter(member => member.group === "community" && member.display === "yes");
     },
     aboutData(){
       return store.state.aboutData
