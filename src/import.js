@@ -14,12 +14,13 @@ export const getData = async function (store) {
 		var allItems = []
 		_.each(values,function(item){
 			var itemObj = {}
-			itemObj.name = item[0]
-			itemObj.group = item[1]
-			itemObj.role = item[2]
-			itemObj.affiliation = item[3]
-			itemObj.image = item[4]
-			itemObj.link = item[5]
+			itemObj.display = item[0]
+			itemObj.name = item[1]
+			itemObj.group = item[2]
+			itemObj.role = item[3]
+			itemObj.affiliation = item[4]
+			itemObj.image = item[5]
+			itemObj.link = item[6]
 			allItems.push(itemObj)
 		})
 		
