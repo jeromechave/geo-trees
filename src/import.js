@@ -20,7 +20,8 @@ export const getData = async function (store) {
 			itemObj.role = item[3]
 			itemObj.affiliation = item[4]
 			itemObj.image = item[5]
-			itemObj.link = item[6]
+			itemObj.zoom = item[6]
+			itemObj.link = item[7]
 			allItems.push(itemObj)
 		})
 		

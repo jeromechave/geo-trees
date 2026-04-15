@@ -24,7 +24,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in executiveBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="(member.name=='Camille Piponiot'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span  v-if="member.role" class="team-member-role">{{member.role}}</span>
@@ -48,7 +48,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span class="team-member-role">{{member.role}}</span>
@@ -64,12 +64,12 @@
           <h2>Community</h2>
           <div class="community-member-list">
             <div class="community-member" v-for="member in community" :class="member.group" v-bind:key="member.name">
-              <div class="community-member-image">
-                <img :class="(member.name=='Luiz Aragão'||member.name=='Bonaventure Sonké'||member.name=='Laura Duncanson'?'zoom':'')" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+              <div class='community-member-image'>
+                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
-              <span v-if="member.role" class="community-member-role">{{member.role}}</span>
-              <span v-if="member.affiliation" class="community-member-affiliation">{{member.affiliation}}</span>
+              <span v-for="r in member.role.split(';')" v-bind:key="r" class="community-member-role">{{r}}</span>
+              <span v-for="f in member.affiliation.split(';')" v-bind:key="f" class="community-member-affiliation">{{f}}</span>
             </div>
           </div>
 
@@ -194,7 +194,7 @@ export default {
               top:50%;
               transform: translate(-50%, -50%);
               &.zoom{
-                width: 150px;
+                width: 150%;
               }
             }
           }
@@ -219,8 +219,15 @@ export default {
           padding-top: 20px;
           margin-bottom: 100px;
           .community-member{
-            width: 19.5%;
+            width: 22.5%;
             text-align: center;
+          }
+          .community-member-role{
+            margin-bottom: 10px;
+          }
+          .community-member-affiliation{
+            font-style: italic;
+            margin-bottom: 10px;
           }
           .community-member-image{
             width: 80px;
@@ -242,7 +249,7 @@ export default {
               top:50%;
               transform: translate(-50%, -50%);
               &.zoom{
-                width: 150px;
+                width: 150%;
               }
             }
           }
