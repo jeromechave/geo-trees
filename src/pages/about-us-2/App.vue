@@ -4,7 +4,7 @@
     <div id="content">
       <div class="content-section section-dark">
         <div class="content-wrapper">
-          <h1>About us 2</h1>
+          <h1>About us</h1>
           <h2>GEO-TREES is enabled by a consortium of established forest inventory networks, advanced concept teams and user groups.</h2>
           <span class="default-text">Many users will benefit from GEO-TREES. These include the Earth Observation community, ecological, forest and biodiversity researchers, and earth system modellers. As confidence in biomass maps increases, GEO-TREES will assist diverse groups including governments, policy-makers, communities and enterprises -everyone needing to know where forest carbon is and how it is changing.</span>
         </div>
@@ -22,14 +22,14 @@
 
           <h2>Network Partners</h2>
           <div class="partners-logo-list x-small-logo">
-            <a :data-zoom="member.zoom=='yes'?'zoom':''" class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link"  target="_blank"><img :src="'https://geo-trees.org/geo-trees/img/'+member.image"/></a>
+            <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link"  target="_blank"><img :src="'https://geo-trees.org/geo-trees/img/'+member.image"/></a>
           </div>
 
           <h2>Community</h2>
           <div class="community-member-list">
             <div class="community-member" v-for="member in community" :class="member.group" v-bind:key="member.name">
               <div class='community-member-image'>
-                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :style="{'width': member.zoom+'%'}" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span v-for="r in member.role.split(';')" v-bind:key="r" class="community-member-role">{{r}}</span>
