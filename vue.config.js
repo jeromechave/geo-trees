@@ -11,6 +11,11 @@ module.exports = {
       title: 'About-us',
       filename: 'about-us.html'
     },
+    'about-us-2':{
+      entry: './src/pages/about-us-2/main.js',
+      title: 'About-us-2',
+      filename: 'about-us-2.html'
+    },
     'project':{
       entry: './src/pages/project/main.js',
       title: 'Project',

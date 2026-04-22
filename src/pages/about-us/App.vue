@@ -24,7 +24,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in executiveBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :style="{'width': member.zoom+'%'}" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span  v-if="member.role" class="team-member-role">{{member.role}}</span>
@@ -48,7 +48,7 @@
           <div class="team-member-list">
             <div class="team-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
               <div class="team-member-image">
-                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :style="{'width': member.zoom+'%'}" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span class="team-member-role">{{member.role}}</span>
@@ -58,14 +58,14 @@
 
           <h2>Network Partners</h2>
           <div class="partners-logo-list x-small-logo">
-            <a class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="'https://geo-trees.org/geo-trees/img/'+member.image"/></a>
+            <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link"  target="_blank"><img :src="'https://geo-trees.org/geo-trees/img/'+member.image"/></a>
           </div>
 
           <h2>Community</h2>
           <div class="community-member-list">
             <div class="community-member" v-for="member in community" :class="member.group" v-bind:key="member.name">
               <div class='community-member-image'>
-                <img :class="member.zoom=='yes'?'zoom':''" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
+                <img :style="{'width': member.zoom+'%'}" :src="'https://geo-trees.org/geo-trees/img/'+member.image"/>
               </div>
               <h3>{{member.name}}</h3>
               <span v-for="r in member.role.split(';')" v-bind:key="r" class="community-member-role">{{r}}</span>
@@ -292,6 +292,9 @@ export default {
             .partner-logo{
               width: 12%;
               height: 100px;
+              &[data-zoom="zoom"]{
+                width: 24%;
+              }
             }
           }
         }
