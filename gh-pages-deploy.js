@@ -13,12 +13,15 @@
  *   npm run deploy            build and deploy, keeping extra files on gh-pages
  *   npm run deploy -- --clean also remove files on gh-pages that are not in the build
  *
- * Plain CommonJS with no dependencies, so it runs on any Node version that can build the site.
+ * No dependencies: only Node and git are needed.
  */
-const { execFileSync } = require('child_process')
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
+import { execFileSync } from 'node:child_process'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const BRANCH = 'gh-pages'
 const REMOTE = 'origin'
@@ -57,19 +60,13 @@ try {
   }
 
   console.log('Building...')
-  // webpack 4 needs the legacy OpenSSL provider on Node 17+
-  const env = { ...process.env }
-  const nodeMajor = Number(process.versions.node.split('.')[0])
-  if (nodeMajor >= 17 && !(env.NODE_OPTIONS || '').includes('--openssl-legacy-provider')) {
-    env.NODE_OPTIONS = ((env.NODE_OPTIONS || '') + ' --openssl-legacy-provider').trim()
-  }
-  run('npm', ['run', 'build'], { env })
+  run('npm', ['run', 'build'], { cwd: __dirname })
 
   console.log('Fetching ' + BRANCH + '...')
   let remoteExists = true
   try {
     git(['fetch', REMOTE, BRANCH], { stdio: 'pipe' })
-  } catch (e) {
+  } catch {
     remoteExists = false
   }
 
@@ -119,9 +116,9 @@ try {
   if (worktree) {
     try {
       git(['worktree', 'remove', '--force', worktree])
-    } catch (e) {
+    } catch {
       fs.rmSync(worktree, { recursive: true, force: true })
-      try { git(['worktree', 'prune']) } catch (e2) { /* ignore */ }
+      try { git(['worktree', 'prune']) } catch { /* ignore */ }
     }
   }
 }

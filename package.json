@@ -1,51 +1,28 @@
 {
   "name": "geo-trees",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
     "deploy": "node gh-pages-deploy.js"
   },
   "dependencies": {
-    "axios": "^1.9.0",
-    "core-js": "^3.6.5",
-    "lodash": "^4.17.21",
-    "sass": "^1.32.5",
-    "sass-loader": "^10.1.1",
-    "vue": "^2.6.11",
-    "vue-custom-element": "^3.2.14",
-    "vue-meta": "^2.4.0",
-    "vuex": "^3.6.0"
+    "vue": "3.5.43"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11",
-    "webpack": "^4.46.0"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+    "@eslint/js": "10.0.1",
+    "@vitejs/plugin-vue": "6.0.9",
+    "eslint": "10.12.0",
+    "eslint-plugin-vue": "10.11.1",
+    "globals": "17.13.0",
+    "sass": "1.105.1",
+    "vite": "8.3.4"
+  }
 }

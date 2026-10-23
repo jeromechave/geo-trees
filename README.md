@@ -1,20 +1,39 @@
 # GEO-TREES website
 
-Source of the GEO-TREES website: a Vue 2 multi-page site deployed to GitHub Pages
-(`gh-pages` branch). Team members, partners, news, opportunities and the site
-directory are loaded at runtime from a Google Sheet.
+Source of the GEO-TREES website, built with [Vue 3](https://vuejs.org) and
+[Vite](https://vite.dev) and deployed to GitHub Pages (`gh-pages` branch).
+Team members, partners, news, opportunities and the site directory are loaded
+at runtime from a Google Sheet, so they can be edited without touching the code.
 
 ## Running locally
 
-Use Node 16 (for example with [nvm](https://github.com/nvm-sh/nvm): `nvm install 16 && nvm use 16`).
+You need Node 20.19 or later (22 recommended; `nvm use` picks it up from `.nvmrc`).
 
 ```
 npm install
-npm run serve
+npm run dev
 ```
 
-On Node 17 or later, webpack 4 needs the legacy OpenSSL provider:
-`NODE_OPTIONS=--openssl-legacy-provider npm run serve`.
+Then open http://localhost:5173. Other commands:
+
+- `npm run build` builds the site into `dist/`.
+- `npm run preview` serves that build at http://localhost:4173/geo-trees/.
+- `npm run lint` checks the code.
+
+## How the code is organised
+
+- `index.html`, `about-us.html`, … one HTML file per page, so the URLs are the same
+  as on the previous site. Each loads `src/entries/<page>.js`.
+- `src/pages/` one Vue component per page.
+- `src/components/SiteHeader.vue` the header and menu shared by every page.
+- `src/lib/sheets.js` reads the Google Sheet tabs and turns rows into objects.
+- `src/config.js` spreadsheet id, API key and where sheet images are hosted.
+- `src/styles/` fonts and the styles shared by all pages.
+- `public/` files copied as they are to the root of the site (logos, photos, PDFs).
+- `pages.config.js` the list of pages. To add one, follow the comment in that file.
+
+The site is built for `https://geo-trees.org/geo-trees/`. To build it for the root
+of a domain instead, run `VITE_BASE=/ npm run build`.
 
 ## Deploying
 
@@ -46,7 +65,7 @@ afterwards so they are not lost if someone deploys with `--clean`.
 
 ## Google Sheets API key
 
-The key is in `src/import.js`. It is called from the browser, so it is visible to
+The key is in `src/config.js`. It is called from the browser, so it is visible to
 anyone and **must be restricted** in
 [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → the key:
 
@@ -64,10 +83,10 @@ curl -s "https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWox
 
 Once the key is restricted to the live domains, the sheet data will not load on
 `localhost`. For local work, create a second key restricted to
-`http://localhost:8080/*` and put it in a `.env.local` file (not committed):
+`http://localhost:5173/*` and put it in a `.env.local` file (not committed):
 
 ```
-VUE_APP_SHEETS_API_KEY=<local key>
+VITE_SHEETS_API_KEY=<local key>
 ```
 
 The spreadsheet itself must stay readable by anyone with the link, so every cell,
