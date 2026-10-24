@@ -62,20 +62,28 @@ tab (case, accents and punctuation ignored) gets "See in the site directory" on
 the map and "Show on map" in the directory. The console lists names found in one
 tab but not the other, to help keep them in sync.
 
-**Background maps.** The outdoors and satellite styles are Mapbox styles that
-currently belong to the `clementthorez` Mapbox account, the developer of the
-previous map. If that account changes or exceeds its quota, the background goes
-blank. Once GEO-TREES has its own Mapbox account, copy or recreate the styles there
-and set, in `.env.local` or the build environment:
+**Background maps.** "Outdoors" is [OpenFreeMap](https://openfreemap.org)'s
+Liberty style: free and open, with no account, no API key and no usage limits.
+It is a vector map drawn by MapLibre GL, which loads only on the Sites page. To
+try another OpenFreeMap style (`positron`, `bright`), set
+`VITE_OPENFREEMAP_STYLE=https://tiles.openfreemap.org/styles/positron` in
+`.env.local`. Browsers without WebGL (rare) get OpenStreetMap's standard map instead.
+
+"Satellite" is still a Mapbox style in the `clementthorez` Mapbox account, the
+developer of the previous map. If that account changes or exceeds its quota, only
+the satellite view goes blank. To move it to a GEO-TREES Mapbox account, set:
 
 ```
 VITE_MAPBOX_TOKEN=pk....
-VITE_MAPBOX_STYLE_OUTDOORS=<account>/<style id>
 VITE_MAPBOX_STYLE_SATELLITE=<account>/<style id>
 ```
 
-Restrict the token to the site's URLs in the Mapbox account. Mapbox and
-OpenStreetMap require the attribution shown in the map's corner to stay visible.
+An open alternative is EOX's Sentinel-2 cloudless imagery (free for
+non-commercial use with attribution, 10 m resolution); the layers are defined in
+`MAP_LAYERS` in `src/config.js`.
+
+The attribution in the map's corner is required by OpenFreeMap/OpenMapTiles,
+OpenStreetMap and Mapbox: keep it visible.
 
 ## Deploying
 

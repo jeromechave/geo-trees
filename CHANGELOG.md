@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.2 (2026-10-24)
+
+### Changed
+- The "Outdoors" background map is now OpenFreeMap's Liberty style (open, no
+  account or API key) instead of a Mapbox style from a personal account. It is
+  drawn by MapLibre GL 6.13, loaded only on the Sites page.
+- "Satellite" is unchanged (Mapbox) and is only loaded when selected.
+
+### Added
+- Browsers without WebGL get OpenStreetMap's standard map as the outdoors view.
+- `VITE_OPENFREEMAP_STYLE` to choose another OpenFreeMap style.
+
 ## 2.0.1 (2026-10-24)
 
 ### Changed

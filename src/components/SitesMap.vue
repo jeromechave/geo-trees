@@ -106,9 +106,9 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
-import { MAP_LAYERS, SITE_STATUSES } from '@/config'
+import { MAP_FALLBACK_LAYER, MAP_LAYERS, SITE_STATUSES } from '@/config'
 import { loadMapSites, slugify } from '@/lib/sheets'
-import { loadLeaflet } from '@/lib/leaflet'
+import { loadLeaflet, loadVectorSupport, supportsWebGL } from '@/lib/leaflet'
 
 const props = defineProps({
   // slugs of the sites listed in the site directory, to link the two
@@ -271,10 +271,31 @@ watch(visibleStatuses, () => {
   fitAll()
 })
 
+// Background layers are created the first time they are shown
+async function createBackground(layer) {
+  if (layer.type === 'vector') {
+    if (supportsWebGL()) {
+      const maplibreGL = await loadVectorSupport()
+      return maplibreGL({ style: layer.style, attributionControl: { customAttribution: layer.attribution } })
+    }
+    layer = MAP_FALLBACK_LAYER
+  }
+  return L.tileLayer(layer.url, { attribution: layer.attribution, maxZoom: layer.maxZoom || 18 })
+}
+
+let backgroundRequest = 0
+async function showBackground(id) {
+  const request = ++backgroundRequest
+  if (!tileLayers[id]) tileLayers[id] = await createBackground(MAP_LAYERS.find((layer) => layer.id === id))
+  if (request !== backgroundRequest || !map.value) return // the user switched again meanwhile
+  Object.entries(tileLayers).forEach(([layerId, layer]) => {
+    if (layerId !== id && map.value.hasLayer(layer)) map.value.removeLayer(layer)
+  })
+  if (!map.value.hasLayer(tileLayers[id])) tileLayers[id].addTo(map.value)
+}
+
 watch(activeLayer, (id) => {
-  if (!map.value) return
-  Object.values(tileLayers).forEach((layer) => map.value.removeLayer(layer))
-  tileLayers[id].addTo(map.value)
+  if (map.value) showBackground(id)
 })
 
 onMounted(async () => {
@@ -284,9 +305,6 @@ onMounted(async () => {
     sites.value = loadedSites
     emit('sites-loaded', new Set(loadedSites.map((site) => site.slug)))
 
-    tileLayers = Object.fromEntries(
-      MAP_LAYERS.map((layer) => [layer.id, L.tileLayer(layer.url, { attribution: layer.attribution, minZoom: 2, maxZoom: 18 })])
-    )
     map.value = L.map(mapElement.value, {
       zoomControl: false,
       minZoom: 2,
@@ -300,8 +318,8 @@ onMounted(async () => {
           scrollMac: 'Use ⌘ + scroll to zoom the map'
         }
       },
-      layers: [tileLayers[activeLayer.value]]
     }).setView([5, 0], 2)
+    showBackground(activeLayer.value)
     map.value.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>')
     map.value.on('zoomend', () => { zoom.value = map.value.getZoom() })
     map.value.on('click', closePanel)

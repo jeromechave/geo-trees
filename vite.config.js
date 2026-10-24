@@ -15,6 +15,8 @@ export default defineConfig(({ command }) => ({
     alias: { '@': root('./src') }
   },
   build: {
+    // MapLibre GL (vector background map) is ~1 MB; it loads only on the Sites page
+    chunkSizeWarningLimit: 1100,
     rolldownOptions: {
       // One HTML file per page, so the URLs stay the same as on the old site
       input: Object.fromEntries(pages.map((page) => [page, root(`./${page}.html`)])),
