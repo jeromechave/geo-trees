@@ -1,0 +1,36 @@
+{
+  "name": "geo-trees",
+  "version": "2.0.3",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "homepage": "https://jeromechave.github.io/geo-trees/",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist -b gh-pages"
+  },
+  "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "0.1.4",
+    "leaflet": "1.9.4",
+    "leaflet-gesture-handling": "1.2.2",
+    "leaflet.markercluster": "1.5.3",
+    "maplibre-gl": "6.13.0",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@vitejs/plugin-vue": "6.0.9",
+    "eslint": "10.12.0",
+    "eslint-plugin-vue": "10.11.1",
+    "gh-pages": "^6.3.0",
+    "globals": "17.13.0",
+    "sass": "1.105.1",
+    "vite": "8.3.4"
+  }
+}
