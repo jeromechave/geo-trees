@@ -1,0 +1,1 @@
+var e=`/geo-trees/assets/maplibre-gl-worker-VaXr2Fck.mjs`;export{e as default};
