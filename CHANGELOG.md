@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.3 (2026-10-24)
+
+### Changed
+- The "Satellite" background is now EOX's Sentinel-2 cloudless mosaic (2024)
+  instead of a Mapbox style. The site no longer uses Mapbox at all: no account,
+  token or style from any Mapbox account remains.
+
+### Added
+- `VITE_EOX_YEAR` to choose another year of the mosaic (2020 to 2024).
+
+### Removed
+- `VITE_MAPBOX_TOKEN` and `VITE_MAPBOX_STYLE_SATELLITE`.
+
 ## 2.0.2 (2026-10-24)
 
 ### Changed

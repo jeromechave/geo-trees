@@ -24,21 +24,16 @@ const OPENFREEMAP_ATTRIBUTION =
   '© <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> ' +
   'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
 
-// "Satellite" is still a Mapbox style in the "clementthorez" account (the developer of
-// the previous map). Once GEO-TREES has its own Mapbox account, set in .env.local:
-//   VITE_MAPBOX_TOKEN=pk....
-//   VITE_MAPBOX_STYLE_SATELLITE=<account>/<style id>
-// or replace this layer with an open imagery source (see README).
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ||
-  'pk.eyJ1IjoiY2xlbWVudHRob3JleiIsImEiOiJja3BzYzl1dDcwbmhkMndxazdoYTB2ZDJ2In0.8Zh8sFimodwWLUEy_lO3Cw'
-const MAPBOX_STYLE_SATELLITE = import.meta.env.VITE_MAPBOX_STYLE_SATELLITE || 'clementthorez/clvqoti6201qs01qp0ahs7sx5'
-
-// Mapbox and OpenStreetMap require this attribution to stay visible on the map.
-const MAPBOX_ATTRIBUTION =
-  '© <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">Mapbox</a> ' +
-  '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> ' +
-  '<a href="https://www.mapbox.com/map-feedback/" target="_blank" rel="noopener">Improve this map</a> ' +
-  '© <a href="https://www.maxar.com/" target="_blank" rel="noopener">Maxar</a>'
+// "Satellite" is EOX's Sentinel-2 cloudless mosaic (https://cloudless.eox.at):
+// free with attribution, no account or API key. The 2018 and later years are licensed
+// CC BY-NC-SA 4.0, i.e. for non-commercial use only. 10 m imagery, sharp up to
+// regional scale; tiles exist up to zoom 14 and are enlarged beyond that.
+// Another year (2020 to 2024) can be chosen with VITE_EOX_YEAR in .env.local.
+const EOX_YEAR = import.meta.env.VITE_EOX_YEAR || '2024'
+const EOX_ATTRIBUTION =
+  '<a href="https://cloudless.eox.at" target="_blank" rel="noopener">EOxCloudless</a> by ' +
+  '<a href="https://eox.at" target="_blank" rel="noopener">EOX IT Services GmbH</a> ' +
+  `(Contains modified Copernicus Sentinel data ${EOX_YEAR})`
 
 // type "vector": a MapLibre style URL; type "raster": a {z}/{x}/{y} tile URL
 export const MAP_LAYERS = [
@@ -47,8 +42,9 @@ export const MAP_LAYERS = [
     id: 'satellite',
     label: 'Satellite',
     type: 'raster',
-    url: `https://api.mapbox.com/styles/v1/${MAPBOX_STYLE_SATELLITE}/tiles/256/{z}/{x}/{y}{r}?access_token=${MAPBOX_TOKEN}`,
-    attribution: MAPBOX_ATTRIBUTION
+    url: `https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-${EOX_YEAR}_3857/default/g/{z}/{y}/{x}.jpg`,
+    attribution: EOX_ATTRIBUTION,
+    maxNativeZoom: 14
   }
 ]
 

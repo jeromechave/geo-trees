@@ -69,21 +69,16 @@ try another OpenFreeMap style (`positron`, `bright`), set
 `VITE_OPENFREEMAP_STYLE=https://tiles.openfreemap.org/styles/positron` in
 `.env.local`. Browsers without WebGL (rare) get OpenStreetMap's standard map instead.
 
-"Satellite" is still a Mapbox style in the `clementthorez` Mapbox account, the
-developer of the previous map. If that account changes or exceeds its quota, only
-the satellite view goes blank. To move it to a GEO-TREES Mapbox account, set:
+"Satellite" is [EOX's Sentinel-2 cloudless](https://cloudless.eox.at) mosaic
+of 2024, also with no account or API key. Its licence (CC BY-NC-SA 4.0 for the
+2018 and later years) allows **non-commercial use only**, with attribution. The
+imagery has a 10 m resolution: sharp at country and regional scale, soft when
+zoomed in on a plot. Another year (2020 to 2024) can be chosen with
+`VITE_EOX_YEAR=2023` in `.env.local`.
 
-```
-VITE_MAPBOX_TOKEN=pk....
-VITE_MAPBOX_STYLE_SATELLITE=<account>/<style id>
-```
-
-An open alternative is EOX's Sentinel-2 cloudless imagery (free for
-non-commercial use with attribution, 10 m resolution); the layers are defined in
-`MAP_LAYERS` in `src/config.js`.
-
-The attribution in the map's corner is required by OpenFreeMap/OpenMapTiles,
-OpenStreetMap and Mapbox: keep it visible.
+The background layers are defined in `MAP_LAYERS` in `src/config.js`. The
+attribution in the map's corner is required by OpenFreeMap/OpenMapTiles,
+OpenStreetMap and EOX: keep it visible.
 
 ## Deploying
 

@@ -280,7 +280,11 @@ async function createBackground(layer) {
     }
     layer = MAP_FALLBACK_LAYER
   }
-  return L.tileLayer(layer.url, { attribution: layer.attribution, maxZoom: layer.maxZoom || 18 })
+  return L.tileLayer(layer.url, {
+    attribution: layer.attribution,
+    maxZoom: layer.maxZoom || 18,
+    maxNativeZoom: layer.maxNativeZoom || layer.maxZoom || 18
+  })
 }
 
 let backgroundRequest = 0
