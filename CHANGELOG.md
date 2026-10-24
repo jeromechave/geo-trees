@@ -1,5 +1,39 @@
 # Changelog
 
+## 2.0.1 (2026-10-24)
+
+### Changed
+- The sites map is now part of the site instead of the separate app embedded
+  from `geo-trees.org/carto/`. Same data (`Datas` tab), diamonds, status filters,
+  site search, outdoors/satellite switch and site panel.
+- Leaflet 1.9.4 (was 1.0.3); it loads only on the Sites page.
+- The legend and the diamonds now use the same colours (ongoing was light green
+  in the legend but amber on the map).
+
+### Added
+- Links between the map and the site directory ("See in the site directory",
+  "Show on map") for sites whose names match.
+- Map and Mapbox style settings in `src/config.js`, overridable with
+  `VITE_MAPBOX_TOKEN`, `VITE_MAPBOX_STYLE_OUTDOORS`, `VITE_MAPBOX_STYLE_SATELLITE`.
+- Keyboard and screen-reader support: markers, filters, layer switch and panel are
+  buttons with labels; Esc closes the panel.
+- Console messages for rows with invalid coordinates or an unknown status, and for
+  names present in only one of the two tabs.
+- On phones the site panel opens as a bottom sheet and the map keeps the selected
+  site visible above it.
+
+### Fixed
+- Mapbox and OpenStreetMap attribution is shown again (it was hidden, which their
+  terms do not allow).
+- A status typo (e.g. `Réalisé`, `completed`, a trailing space) no longer makes a
+  site disappear from the map.
+- Coordinates written with a decimal comma are read correctly.
+- Site names from the sheet are always displayed as text, never interpreted as HTML.
+
+### Removed
+- The unused Esri scripts (a 2014 beta) loaded from a third-party bucket, the map's
+  service worker, and the place search (searching any address on OpenStreetMap).
+
 ## 2.0.0 (2026-10-23)
 
 The site moves from Vue 2 / Vue CLI to Vue 3 / Vite. Pages, URLs, content and

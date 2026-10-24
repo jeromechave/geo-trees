@@ -1,4 +1,4 @@
-import { SPREADSHEET_ID, SHEETS_API_KEY } from '@/config'
+import { SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -89,4 +89,67 @@ export async function loadSites() {
     Networks_websites: list(row, 13)
   }))
   return groupBy(items, 'country')
+}
+
+// "Lopé National Park" -> "lope-national-park". Used to match the same site
+// between the "Datas" (map) and "Sitesdirectory" (directory) tabs.
+export const slugify = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+const normalizeWords = (value) => slugify(value).replace(/-/g, ' ')
+
+const STATUS_BY_ALIAS = new Map(
+  SITE_STATUSES.flatMap((status) => status.aliases.map((alias) => [normalizeWords(alias), status.id]))
+)
+
+// Accepts "1", "yes", "x", "true", "oui" (any case)
+const isChecked = (value) => ['1', 'yes', 'y', 'x', 'true', 'oui'].includes(value.toLowerCase())
+
+// Accepts "-0.2" and "-0,2"
+const coordinate = (value) => parseFloat(value.replace(',', '.'))
+
+// "Datas" tab: one row per site shown on the map
+export async function loadMapSites() {
+  const rows = await fetchRange('Datas!A2:K10000')
+  const sites = []
+  rows.forEach((row, index) => {
+    const line = index + 2 // spreadsheet row number, for messages
+    const name = cell(row, 0)
+    const lat = coordinate(cell(row, 3))
+    const lon = coordinate(cell(row, 4))
+    if (!name) return
+    if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
+      console.warn(`Map: "${name}" (Datas row ${line}) has no valid coordinates and is not shown.`)
+      return
+    }
+    const rawStatus = cell(row, 5)
+    let status = STATUS_BY_ALIAS.get(normalizeWords(rawStatus))
+    if (!status) {
+      console.warn(`Map: "${name}" (Datas row ${line}) has an unknown status "${rawStatus}"; shown as planned.`)
+      status = 'planned'
+    }
+    sites.push({
+      id: `${slugify(name)}-${line}`,
+      slug: slugify(name),
+      name,
+      description: cell(row, 1),
+      country: cell(row, 2),
+      lat,
+      lon,
+      status,
+      date: cell(row, 6),
+      url: cell(row, 7),
+      measurements: {
+        inventory: isChecked(cell(row, 10)),
+        als: isChecked(cell(row, 8)),
+        tls: isChecked(cell(row, 9))
+      }
+    })
+  })
+  return sites
 }

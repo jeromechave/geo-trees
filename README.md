@@ -35,6 +35,48 @@ Then open http://localhost:5173. Other commands:
 The site is built for `https://geo-trees.org/geo-trees/`. To build it for the root
 of a domain instead, run `VITE_BASE=/ npm run build`.
 
+## The sites map
+
+The map on the Sites page is part of this site (`src/components/SitesMap.vue`).
+It replaces the separate map previously embedded from `geo-trees.org/carto/`.
+
+**Data.** It reads the `Datas` tab of the same Google Sheet, one row per site:
+
+| Column | Content |
+| --- | --- |
+| A | Site name |
+| B | Description |
+| C | Country |
+| D, E | Latitude, longitude (decimal degrees; `5.27` or `5,27`) |
+| F | Status: `réalisé` / `completed`, `en cours` / `ongoing`, `futur` / `planned` (case and accents ignored) |
+| G | Date shown next to the status |
+| H | Website URL |
+| I, J, K | ALS, TLS, forest plot inventory done: `1`, `yes` or `x` |
+
+Rows without valid coordinates are skipped and an unknown status is shown as
+planned; both are reported in the browser console (View → Developer → JavaScript
+Console). Accepted status words and the diamond colours are in `src/config.js`.
+
+**Map and directory.** A site whose name matches an entry of the `Sitesdirectory`
+tab (case, accents and punctuation ignored) gets "See in the site directory" on
+the map and "Show on map" in the directory. The console lists names found in one
+tab but not the other, to help keep them in sync.
+
+**Background maps.** The outdoors and satellite styles are Mapbox styles that
+currently belong to the `clementthorez` Mapbox account, the developer of the
+previous map. If that account changes or exceeds its quota, the background goes
+blank. Once GEO-TREES has its own Mapbox account, copy or recreate the styles there
+and set, in `.env.local` or the build environment:
+
+```
+VITE_MAPBOX_TOKEN=pk....
+VITE_MAPBOX_STYLE_OUTDOORS=<account>/<style id>
+VITE_MAPBOX_STYLE_SATELLITE=<account>/<style id>
+```
+
+Restrict the token to the site's URLs in the Mapbox account. Mapbox and
+OpenStreetMap require the attribution shown in the map's corner to stay visible.
+
 ## Deploying
 
 ```

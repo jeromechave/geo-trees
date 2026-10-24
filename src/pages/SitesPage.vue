@@ -6,7 +6,12 @@
       <div class="content-wrapper">
         <h1>Biomass Reference Measurement Sites</h1>
       </div>
-      <iframe src="https://geo-trees.org/carto/" title="Map of the Biomass Reference Measurement sites" width="100%" height="600px"></iframe>
+      <SitesMap
+        ref="sitesMap"
+        :directory-slugs="directorySlugs"
+        @sites-loaded="mapSlugs = $event"
+        @show-in-directory="showInDirectory"
+      />
     </div>
 
     <div class="content-section section-light">
@@ -16,8 +21,22 @@
         <div class="sites-repertory">
           <div class="sites-repertory-country" v-for="(country, index) in sitesData" :key="index">
             <h3 class="country-name">{{ country[0]["country"] }}</h3>
-            <div class="site-container" :class="{'open': openSites.includes(site)}" v-for="(site,siteindex) in country" :key="siteindex">
-              <div class="site-name-container" @click="toggleSiteDetails(site)">
+            <div
+              v-for="(site,siteindex) in country"
+              :id="'site-' + slugify(site.name)"
+              :key="siteindex"
+              class="site-container"
+              :class="{'open': openSites.includes(site)}"
+            >
+              <div
+                class="site-name-container"
+                role="button"
+                tabindex="0"
+                :aria-expanded="openSites.includes(site) ? 'true' : 'false'"
+                @click="toggleSiteDetails(site)"
+                @keydown.enter.prevent="toggleSiteDetails(site)"
+                @keydown.space.prevent="toggleSiteDetails(site)"
+              >
                 <h4 class="site-name" >{{ site.name }}</h4>
                 <span class="site-name-arrow" v-if="openSites.includes(site)">▶</span>
                 <span class="site-name-arrow" v-else>▼</span>
@@ -31,6 +50,9 @@
                   <div class="site-details-item-row">
                     <span class="site-details-item-label">Longitude: </span>
                     <span class="site-details-item-value">{{ site.longitude }}</span>
+                  </div>
+                  <div class="site-details-item-row" v-if="mapSlugs.has(slugify(site.name))">
+                    <button type="button" class="show-on-map" @click="showOnMap(site)">Show on map</button>
                   </div>
                   <div class="site-details-item-row" v-if="site.Website!=''">
                     <span class="site-details-item-label">Website: </span>
@@ -72,11 +94,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import SiteHeader from '@/components/SiteHeader.vue'
 import SheetError from '@/components/SheetError.vue'
+import SitesMap from '@/components/SitesMap.vue'
 import { useSheet } from '@/composables/useSheet'
-import { loadSites } from '@/lib/sheets'
+import { loadSites, slugify } from '@/lib/sheets'
 
 const { data: sitesData, error } = useSheet(loadSites)
 
@@ -88,6 +111,39 @@ const toggleSiteDetails = (site) => {
     openSites.value.push(site)
   }
 }
+
+// ---- links between the map ("Datas" tab) and the directory ("Sitesdirectory" tab),
+// matched by site name (case, accents and punctuation ignored)
+const sitesMap = ref(null)
+const mapSlugs = ref(new Set())
+const directorySites = computed(() => Object.values(sitesData.value || {}).flat())
+const directorySlugs = computed(() => new Set(directorySites.value.map((site) => slugify(site.name))))
+
+function showInDirectory(slug) {
+  const site = directorySites.value.find((item) => slugify(item.name) === slug)
+  if (!site) return
+  if (!openSites.value.includes(site)) openSites.value.push(site)
+  nextTick(() => {
+    const element = document.getElementById('site-' + slug)
+    if (!element) return
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    element.querySelector('.site-name-container').focus({ preventScroll: true })
+  })
+}
+
+function showOnMap(site) {
+  sitesMap.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  sitesMap.value.focusSite(slugify(site.name))
+}
+
+// Helps editors keep the two tabs in sync (visible in the browser console)
+watch([mapSlugs, directorySlugs], ([onMap, inDirectory]) => {
+  if (onMap.size === 0 || inDirectory.size === 0) return
+  const notInDirectory = [...onMap].filter((slug) => !inDirectory.has(slug))
+  const notOnMap = [...inDirectory].filter((slug) => !onMap.has(slug))
+  if (notInDirectory.length) console.info('Sites on the map ("Datas") with no directory entry:', notInDirectory)
+  if (notOnMap.length) console.info('Directory sites ("Sitesdirectory") not on the map:', notOnMap)
+})
 </script>
 
 <style lang="scss">
@@ -96,8 +152,9 @@ const toggleSiteDetails = (site) => {
 #app {
   #content{
     .content-section{
-      iframe{
-        transform: translateY(60px);
+      // same placement as the previous embedded map (overlaps the next section by 60px)
+      .sites-map{
+        top: 60px;
       }
       .content-wrapper{
         .sites-repertory{
@@ -205,4 +262,21 @@ const toggleSiteDetails = (site) => {
   }
 }
 
+
+#app #content .sites-repertory {
+  .site-name-container:focus-visible {
+    outline: 2px solid #53A034;
+    outline-offset: 3px;
+  }
+  .show-on-map {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+}
 </style>
