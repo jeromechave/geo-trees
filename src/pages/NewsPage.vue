@@ -12,7 +12,7 @@
     <div class="content-section section-light">
       <div class="content-wrapper">
         <SheetError v-if="error" />
-        <div class="news-item" v-for="news in newsData" :key="news.title">
+        <div class="news-item" v-for="(news, position) in newsData" :key="position">
           <div class="news-item-image">
             <img :src="news.img_url" alt=""/>
           </div>
@@ -21,7 +21,7 @@
             <div class="news-item-date">{{ news.date }}</div>
             <div class="news-item-text">{{ news.text }}</div>
             <div class="news-item-link">
-              <a v-for="(link_text, i) in news.link_text" :key="link_text" :href="news.link_url[i]" target="_blank">{{ link_text }}</a>
+              <a v-for="(link_text, i) in news.link_text" :key="i" :href="news.link_url[i]" target="_blank">{{ link_text }}</a>
             </div>
           </div>
         </div>

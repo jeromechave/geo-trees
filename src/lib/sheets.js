@@ -5,10 +5,12 @@ import { MAP_SPREADSHEET_ID, MEASUREMENT_STATES, MEASUREMENTS, SPREADSHEET_ID, S
 const cell = (row, i) => (row[i] === undefined || row[i] === null ? '' : String(row[i]).trim())
 
 // "a;b;c" -> ['a', 'b', 'c']; empty cell -> [] (not ['']).
-// Inner empty items are kept so paired columns (names / urls) stay aligned.
+// Empty items at the end ("a; b;") are dropped; inner ones ("a;;c") are kept so
+// paired columns (names / urls) stay aligned.
 const list = (row, i) => {
-  const value = cell(row, i)
-  return value === '' ? [] : value.split(';').map((item) => item.trim())
+  const items = cell(row, i).split(';').map((item) => item.trim())
+  while (items.length && items[items.length - 1] === '') items.pop()
+  return items
 }
 
 const groupBy = (items, key) =>
@@ -46,7 +48,7 @@ export async function loadAbout() {
 }
 
 export async function loadNews() {
-  const rows = await fetchRange('news!A2:K10000')
+  const rows = await fetchRange('News!A2:K10000')
   return rows.map((row) => ({
     date: cell(row, 0),
     title: cell(row, 1),
@@ -58,7 +60,7 @@ export async function loadNews() {
 }
 
 export async function loadOpportunities() {
-  const rows = await fetchRange('opportunities!A2:K10000')
+  const rows = await fetchRange('Opportunities!A2:K10000')
   const items = rows.map((row) => ({
     categorie: cell(row, 0),
     date: cell(row, 1),

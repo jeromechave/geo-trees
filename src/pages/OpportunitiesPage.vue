@@ -14,12 +14,12 @@
         <h2>Awards & fellowships</h2>
         <SheetError v-if="error" />
         <span class="default-text" v-else-if="!opportunitiesData['awards'] || opportunitiesData['awards'].length==0" >Content forthcoming.</span>
-        <div class="opportunities-item" v-for="item in opportunitiesData['awards']" :key="item.title">
+        <div class="opportunities-item" v-for="(item, position) in opportunitiesData['awards']" :key="position">
           <div class="opportunities-item-title">{{ item.title }}</div>
           <div class="opportunities-item-date">{{ item.date }}</div>
           <div class="opportunities-item-text">{{ item.text }}</div>
           <div class="opportunities-item-link">
-            <a v-for="(link_text, i) in item.link_text" :key="link_text" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
+            <a v-for="(link_text, i) in item.link_text" :key="i" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
           </div>
         </div>
       </div>
@@ -29,12 +29,12 @@
       <div class="content-wrapper">
         <h2>Job board</h2>
         <span class="default-text" v-if="!error && (!opportunitiesData['job'] || opportunitiesData['job'].length==0)" >Content forthcoming.</span>
-        <div class="opportunities-item" v-for="item in opportunitiesData['job']" :key="item.title">
+        <div class="opportunities-item" v-for="(item, position) in opportunitiesData['job']" :key="position">
           <div class="opportunities-item-title">{{ item.title }}</div>
           <div class="opportunities-item-date">{{ item.date }}</div>
           <div class="opportunities-item-text">{{ item.text }}</div>
           <div class="opportunities-item-link">
-            <a v-for="(link_text, i) in item.link_text" :key="link_text" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
+            <a v-for="(link_text, i) in item.link_text" :key="i" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
           </div>
         </div>
       </div>

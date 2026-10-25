@@ -21,7 +21,7 @@
 
         <h2>Executive Board</h2>
         <div class="team-member-list">
-          <div class="team-member" v-for="member in executiveBoard" :class="member.group" v-bind:key="member.name">
+          <div class="team-member" v-for="(member, position) in executiveBoard" :class="member.group" :key="position">
             <div class="team-member-image">
               <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
             </div>
@@ -33,7 +33,7 @@
 
         <h2>Project Managers</h2>
         <div class="team-member-list">
-          <div class="team-member" v-for="member in projectManager" :class="member.group" v-bind:key="member.name">
+          <div class="team-member" v-for="(member, position) in projectManager" :class="member.group" :key="position">
             <div class="team-member-image">
               <img :src="sheetImage(member.image)" alt=""/>
             </div>
@@ -45,7 +45,7 @@
 
         <h2>Scientific Advisory Board</h2>
         <div class="team-member-list">
-          <div class="team-member" v-for="member in scientificBoard" :class="member.group" v-bind:key="member.name">
+          <div class="team-member" v-for="(member, position) in scientificBoard" :class="member.group" :key="position">
             <div class="team-member-image">
               <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
             </div>
@@ -57,30 +57,30 @@
 
         <h2>Network Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="member in networksPartners" v-bind:key="member.name" :href="member.link"  target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link"  target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <h2>Community</h2>
         <div class="community-member-list">
-          <div class="community-member" v-for="member in community" :class="member.group" v-bind:key="member.name">
+          <div class="community-member" v-for="(member, position) in community" :class="member.group" :key="position">
             <div class="community-member-image">
               <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
             </div>
             <h3>{{member.name}}</h3>
-            <span v-for="r in splitList(member.role)" v-bind:key="r" class="community-member-role">{{r}}</span>
-            <span v-for="f in splitList(member.affiliation)" v-bind:key="f" class="community-member-affiliation">{{f}}</span>
+            <span v-for="(r, position) in splitList(member.role)" :key="position" class="community-member-role">{{r}}</span>
+            <span v-for="(f, position) in splitList(member.affiliation)" :key="position" class="community-member-affiliation">{{f}}</span>
           </div>
         </div>
 
         <h2>Site Partners</h2>
         <a href="https://geo-trees.org/sites.html">More information about the sites</a>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="member in sitePartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in sitePartners" :key="position" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <h2>Supporting Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="member in supportingPartners" v-bind:key="member.name" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in supportingPartners" :key="position" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
       </div>

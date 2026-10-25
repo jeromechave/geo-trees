@@ -60,27 +60,27 @@
                   </div>
                   <div class="site-details-item-row" v-if="site.PI_Names.length>0">
                     <span class="site-details-item-label">PI Names: </span>
-                    <span class="site-details-item-value" v-for="Names in site.PI_Names" :key="Names">{{ Names }}</span>
+                    <span class="site-details-item-value" v-for="(Names, position) in site.PI_Names" :key="position">{{ Names }}</span>
                   </div>
                   <div class="site-details-item-row" v-if="site.PI_Institutions_Names.length>0">
                     <span class="site-details-item-label">Supporting Institutions: </span>
-                    <a class="site-details-item-value" v-for="(Institutions_Names, i) in site.PI_Institutions_Names" :key="Institutions_Names" :href="site.Support_Institutions_websites[i]" target="_blank">{{ Institutions_Names }}</a>
+                    <a class="site-details-item-value" v-for="(Institutions_Names, i) in site.PI_Institutions_Names" :key="i" :href="site.Support_Institutions_websites[i]" target="_blank">{{ Institutions_Names }}</a>
                   </div>
                   <!-- <div class="site-details-item-row" v-if="site.Funders.length>0">
                     <span class="site-details-item-label">Funders: </span>
-                    <span class="site-details-item-value" v-for="Funders in site.Funders" :key="Funders">{{ Funders }}</span>
+                    <span class="site-details-item-value" v-for="(Funders, position) in site.Funders" :key="position">{{ Funders }}</span>
                   </div
                   <div class="site-details-item-row" v-if="site.Partners_Names.length>0">
                     <span class="site-details-item-label">Partners Names: </span>
-                    <span class="site-details-item-value" v-for="Names in site.Partners_Names" :key="Names">{{ Names }}</span>
+                    <span class="site-details-item-value" v-for="(Names, position) in site.Partners_Names" :key="position">{{ Names }}</span>
                   </div>
                   <div class="site-details-item-row" v-if="site.Partners_Institutions_Names.length>0">
                     <span class="site-details-item-label">Partners Institutions: </span>
-                    <a class="site-details-item-value" v-for="(Partners_Institutions_Names, i) in site.Partners_Institutions_Names" :key="Partners_Institutions_Names" :href="site.Partners_Institutions_Websites[i]" target="_blank">{{ Partners_Institutions_Names }}</a>
+                    <a class="site-details-item-value" v-for="(Partners_Institutions_Names, i) in site.Partners_Institutions_Names" :key="i" :href="site.Partners_Institutions_Websites[i]" target="_blank">{{ Partners_Institutions_Names }}</a>
                   </div>  -->
                   <div class="site-details-item-row" v-if="site.Networks_Names.length>0">
                     <span class="site-details-item-label">Networks: </span>
-                    <a class="site-details-item-value" v-for="(Networks_Names, i) in site.Networks_Names" :key="Networks_Names" :href="site.Networks_websites[i]" target="_blank">{{ Networks_Names }}</a>
+                    <a class="site-details-item-value" v-for="(Networks_Names, i) in site.Networks_Names" :key="i" :href="site.Networks_websites[i]" target="_blank">{{ Networks_Names }}</a>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.8 (2026-10-24)
+
+### Fixed
+- The `News` and `Opportunities` tabs are requested with their new capitalised
+  names.
+- Cells ending with a semicolon (`Name A; Name B;`) no longer produce an empty
+  entry in the site directory.
+- Repeated names in a cell (e.g. the same institution listed twice) are all shown:
+  lists are no longer identified by their text, which Vue requires to be unique.
+
 ## 2.0.7 (2026-10-24)
 
 ### Changed

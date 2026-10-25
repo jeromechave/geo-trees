@@ -129,7 +129,8 @@ afterwards so they are not lost if someone deploys with `--clean`.
 
 All content comes from the Geotrees_Back-CARTO spreadsheet
 (https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng),
-tabs `Aboutus`, `news`, `opportunities`, `Sitesdirectory` and `Datas`. The tab
+tabs `Datas`, `Aboutus`, `Sitesdirectory`, `Opportunities` and `News` (other tabs
+are ignored). The tab
 names and column order must stay as they are. The spreadsheet must be shared as
 **Anyone with the link: Viewer**, because visitors' browsers read it directly.
 
