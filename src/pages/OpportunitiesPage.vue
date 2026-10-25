@@ -19,7 +19,7 @@
           <div class="opportunities-item-date">{{ item.date }}</div>
           <div class="opportunities-item-text">{{ item.text }}</div>
           <div class="opportunities-item-link">
-            <a v-for="(link_text, i) in item.link_text" :key="i" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
+            <template v-for="(link, i) in item.links" :key="i"><a v-if="link.url" :href="link.url" target="_blank" rel="noopener">{{ link.name }}</a><span v-else>{{ link.name }}</span></template>
           </div>
         </div>
       </div>
@@ -34,7 +34,7 @@
           <div class="opportunities-item-date">{{ item.date }}</div>
           <div class="opportunities-item-text">{{ item.text }}</div>
           <div class="opportunities-item-link">
-            <a v-for="(link_text, i) in item.link_text" :key="i" :href="item.link_url[i]" target="_blank">{{ link_text }}</a>
+            <template v-for="(link, i) in item.links" :key="i"><a v-if="link.url" :href="link.url" target="_blank" rel="noopener">{{ link.name }}</a><span v-else>{{ link.name }}</span></template>
           </div>
         </div>
       </div>

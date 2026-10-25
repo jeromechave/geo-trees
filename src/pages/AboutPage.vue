@@ -100,7 +100,7 @@ import { computed } from 'vue'
 import SiteHeader from '@/components/SiteHeader.vue'
 import SheetError from '@/components/SheetError.vue'
 import { useSheet } from '@/composables/useSheet'
-import { loadAbout } from '@/lib/sheets'
+import { loadAbout, splitItems } from '@/lib/sheets'
 import { sheetImage } from '@/config'
 
 const { data: aboutData, error } = useSheet(loadAbout)
@@ -117,7 +117,7 @@ const sitePartners = group('site-partners')
 const supportingPartners = group('supporting-partners')
 const community = group('community')
 
-const splitList = (value) => (value ? value.split(';').map((item) => item.trim()) : [])
+const splitList = splitItems // "a; b" -> ['a', 'b']
 </script>
 
 <style lang="scss">

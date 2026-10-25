@@ -21,7 +21,7 @@
             <div class="news-item-date">{{ news.date }}</div>
             <div class="news-item-text">{{ news.text }}</div>
             <div class="news-item-link">
-              <a v-for="(link_text, i) in news.link_text" :key="i" :href="news.link_url[i]" target="_blank">{{ link_text }}</a>
+              <template v-for="(link, i) in news.links" :key="i"><a v-if="link.url" :href="link.url" target="_blank" rel="noopener">{{ link.name }}</a><span v-else>{{ link.name }}</span></template>
             </div>
           </div>
         </div>

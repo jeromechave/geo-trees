@@ -13,22 +13,21 @@ import {
 // may be missing. These helpers always return a string / an array.
 const cell = (row, i) => (row[i] === undefined || row[i] === null ? '' : String(row[i]).trim())
 
-// A list cell: items separated by ";" or by line breaks (both are used in the sheet).
-// "a; b;" -> ['a', 'b'], empty cell -> []
-const list = (row, i) =>
-  cell(row, i)
+// A list cell: items separated by ";" ("a; b; c"), however many there are.
+// Empty items are skipped ("a; b;" -> ['a', 'b']); a line break is accepted as a
+// separator too, in case one slips into the sheet.
+export const splitItems = (value) =>
+  String(value || '')
     .split(/;|\r?\n/)
     .map((item) => item.trim())
     .filter((item) => item !== '')
+const list = (row, i) => splitItems(cell(row, i))
 
-// A cell of web addresses: separated by ";", line breaks or spaces (an address never
-// contains a space). "www.example.org" gets "https://", otherwise the browser would
-// treat it as a page of this website.
-const urls = (row, i) =>
-  cell(row, i)
-    .split(/[;\s]+/)
-    .filter((url) => url !== '')
-    .map((url) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`))
+// A cell of web addresses, separated by ";" like other lists (an address may contain
+// spaces, e.g. a PDF name). "www.example.org" gets "https://", otherwise the browser
+// would treat it as a page of this website.
+const withScheme = (url) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`)
+const urls = (row, i) => list(row, i).map(withScheme)
 
 // Short labels for a list of web addresses: "example.org", or "example.org/en/page"
 // when two addresses of the list are on the same site.
@@ -46,19 +45,20 @@ export function linkLabels(addresses) {
   )
 }
 
-// Pairs names with the web addresses of the next column, by position. When the two
-// cells do not have the same number of items, the pairs would be wrong, so the names
-// are shown without links and the problem is reported in the browser console.
-function linked(names, addresses, site, what) {
-  const paired = names.length === addresses.length
-  if (!paired && addresses.length > 0) {
-    console.warn(
-      names.length === 0
-        ? `Directory: "${site}" has ${addresses.length} websites for ${what} but no names; not shown.`
-        : `Directory: "${site}" has ${names.length} ${what} but ${addresses.length} websites; shown without links.`
-    )
+// Pairs the names of one cell with the web addresses of the next, in order: the 1st
+// name with the 1st address, and so on, for as many items as each cell contains.
+// A name without an address is shown as text; an address without a name is shown as
+// a link labelled with its site. Different counts are noted in the browser console,
+// since one missing item shifts the pairs that follow it.
+function linked(names, addresses, where, what) {
+  if (names.length !== addresses.length && names.length && addresses.length) {
+    console.info(`${where}: ${names.length} ${what} and ${addresses.length} web addresses, paired in order.`)
   }
-  return names.map((name, index) => ({ name, url: paired ? addresses[index] : null }))
+  const labels = linkLabels(addresses)
+  return Array.from({ length: Math.max(names.length, addresses.length) }, (_, index) => ({
+    name: names[index] || labels[index],
+    url: addresses[index] || null
+  }))
 }
 
 const groupBy = (items, key) =>
@@ -91,7 +91,7 @@ export async function loadAbout() {
     affiliation: cell(row, 4),
     image: cell(row, 5),
     zoom: cell(row, 6),
-    link: cell(row, 7)
+    link: urls(row, 7)[0] || '' // one partner website
   }))
 }
 
@@ -101,8 +101,7 @@ export async function loadNews() {
     date: cell(row, 0),
     title: cell(row, 1),
     text: cell(row, 2),
-    link_text: list(row, 3),
-    link_url: list(row, 4),
+    links: linked(list(row, 3), urls(row, 4), `News "${cell(row, 1)}"`, 'link texts'),
     img_url: cell(row, 5)
   }))
 }
@@ -114,8 +113,7 @@ export async function loadOpportunities() {
     date: cell(row, 1),
     title: cell(row, 2),
     text: cell(row, 3),
-    link_text: list(row, 4),
-    link_url: list(row, 5)
+    links: linked(list(row, 4), urls(row, 5), `Opportunity "${cell(row, 2)}"`, 'link texts')
   }))
   return groupBy(items, 'categorie')
 }
@@ -199,11 +197,11 @@ export async function loadSites() {
       websites: urls(row, C.website),
       piNames: list(row, C.piNames),
       // [{ name, url }]; url is null when names and websites do not pair up
-      institutions: linked(list(row, C.piInstitutions), urls(row, C.supportWebsites), name, 'supporting institutions'),
+      institutions: linked(list(row, C.piInstitutions), urls(row, C.supportWebsites), `Directory "${name}"`, 'supporting institutions'),
       funders: list(row, C.funders),
       partnerNames: list(row, C.partnerNames),
-      partnerInstitutions: linked(list(row, C.partnerInstitutions), urls(row, C.partnerWebsites), name, 'partner institutions'),
-      networks: linked(list(row, C.networks), urls(row, C.networkWebsites), name, 'networks')
+      partnerInstitutions: linked(list(row, C.partnerInstitutions), urls(row, C.partnerWebsites), `Directory "${name}"`, 'partner institutions'),
+      networks: linked(list(row, C.networks), urls(row, C.networkWebsites), `Directory "${name}"`, 'networks')
     }
   })
   return groupBy(items, 'country')

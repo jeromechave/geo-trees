@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.14 (2026-10-24)
+
+Goes with GEOTREES_Supersites_fixed.xlsx, where every list cell is written
+`item; item; item`.
+
+### Changed
+- Lists are separated by `;`, with any number of items, in every tab. Web addresses
+  are no longer split on spaces (some PDF names contain spaces).
+- Names and websites are paired in order for as many items as each cell contains:
+  a name without a website is shown as text, a website without a name as a link
+  labelled with its site. (2.0.13 showed no links when the counts differed.)
+- The same pairing for the links of News and Opportunities; a partner's logo link
+  on About us uses the first address of its cell (some ended with a stray `;`).
+
 ## 2.0.13 (2026-10-24)
 
 ### Fixed

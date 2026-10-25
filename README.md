@@ -59,10 +59,12 @@ Google Sheet, one row per site:
 | Q, R | Networks_Names, Networks_websites | directory |
 | S, T | PIs email adress, Ayala_updates_track | never read |
 
-Columns J–R hold lists separated by `;` or by line breaks. In each name/website
-pair of columns (K–L, O–P, Q–R) the n-th website belongs to the n-th name; if the
-two cells do not have the same number of items, the names are shown without links
-and the browser console says so. Web addresses may omit `https://`. Format columns D and E as
+Columns J–R hold lists separated by `;` (`Name A; Name B; Name C`), with any
+number of items. In each name/website pair of columns (K–L, O–P, Q–R) the n-th
+website is linked to the n-th name; extra names are shown as text and extra websites
+as links labelled with their site. The same applies to `Link_text` / `Link_url` in
+`News` and `Opportunities`. Web addresses may omit `https://`, and may contain
+spaces (e.g. a PDF name), so they too are separated by `;`. Format columns D and E as
 **Format → Number → Plain text** in Google Sheets: in a French-locale sheet, typing
 `4.08` in an automatic cell turns it into a date.
 
