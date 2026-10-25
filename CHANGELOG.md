@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.13 (2026-10-24)
+
+### Fixed
+- List cells separated by line breaks (16 sites) are split correctly; they produced
+  broken links such as `https://afritron.org/%20%20https://forestplots.net/`.
+- Web addresses without `https://` (e.g. `www.kufos.ac.in`) no longer point to a
+  page of this website.
+- A Site_URL cell with several addresses (Manaus, Sepilok) gives one link per
+  address in the directory and the map panel, labelled by site.
+- When names and websites do not pair up (different numbers of items), the names
+  are shown without links instead of linking to the wrong organisation; the
+  console lists those cells.
+- "Show on map" uses the site's font.
+
 ## 2.0.12 (2026-10-24)
 
 Goes with the merged `Data` tab (GEOTREES_Supersite_Data.xlsx): the

@@ -13,13 +13,52 @@ import {
 // may be missing. These helpers always return a string / an array.
 const cell = (row, i) => (row[i] === undefined || row[i] === null ? '' : String(row[i]).trim())
 
-// "a;b;c" -> ['a', 'b', 'c']; empty cell -> [] (not ['']).
-// Empty items at the end ("a; b;") are dropped; inner ones ("a;;c") are kept so
-// paired columns (names / urls) stay aligned.
-const list = (row, i) => {
-  const items = cell(row, i).split(';').map((item) => item.trim())
-  while (items.length && items[items.length - 1] === '') items.pop()
-  return items
+// A list cell: items separated by ";" or by line breaks (both are used in the sheet).
+// "a; b;" -> ['a', 'b'], empty cell -> []
+const list = (row, i) =>
+  cell(row, i)
+    .split(/;|\r?\n/)
+    .map((item) => item.trim())
+    .filter((item) => item !== '')
+
+// A cell of web addresses: separated by ";", line breaks or spaces (an address never
+// contains a space). "www.example.org" gets "https://", otherwise the browser would
+// treat it as a page of this website.
+const urls = (row, i) =>
+  cell(row, i)
+    .split(/[;\s]+/)
+    .filter((url) => url !== '')
+    .map((url) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`))
+
+// Short labels for a list of web addresses: "example.org", or "example.org/en/page"
+// when two addresses of the list are on the same site.
+export function linkLabels(addresses) {
+  const parts = addresses.map((url) => {
+    try {
+      const { hostname, pathname } = new URL(url)
+      return { host: hostname.replace(/^www\./, ''), path: pathname.replace(/\/$/, '') }
+    } catch {
+      return { host: url, path: '' }
+    }
+  })
+  return parts.map(({ host, path }) =>
+    parts.filter((other) => other.host === host).length > 1 && path ? `${host}${path}` : host
+  )
+}
+
+// Pairs names with the web addresses of the next column, by position. When the two
+// cells do not have the same number of items, the pairs would be wrong, so the names
+// are shown without links and the problem is reported in the browser console.
+function linked(names, addresses, site, what) {
+  const paired = names.length === addresses.length
+  if (!paired && addresses.length > 0) {
+    console.warn(
+      names.length === 0
+        ? `Directory: "${site}" has ${addresses.length} websites for ${what} but no names; not shown.`
+        : `Directory: "${site}" has ${names.length} ${what} but ${addresses.length} websites; shown without links.`
+    )
+  }
+  return names.map((name, index) => ({ name, url: paired ? addresses[index] : null }))
 }
 
 const groupBy = (items, key) =>
@@ -129,7 +168,7 @@ export async function loadMapSites() {
       country: cell(row, C.country),
       lat,
       lon,
-      url: cell(row, C.website),
+      urls: urls(row, C.website),
       // { als: 'completed', tls: 'ongoing', plot: 'not-started' }
       measurements: Object.fromEntries(
         MEASUREMENTS.map((measurement) => {
@@ -150,21 +189,22 @@ export async function loadMapSites() {
 // Sites in the directory below the map, grouped by country
 export async function loadSites() {
   const rows = await loadDataRows()
-  const items = rows.map(({ row }) => ({
-    country: cell(row, C.country),
-    name: cell(row, C.name),
-    latitude: cell(row, C.latitude),
-    longitude: cell(row, C.longitude),
-    Website: cell(row, C.website),
-    PI_Names: list(row, C.piNames),
-    PI_Institutions_Names: list(row, C.piInstitutions),
-    Support_Institutions_websites: list(row, C.supportWebsites),
-    Funders: list(row, C.funders),
-    Partners_Names: list(row, C.partnerNames),
-    Partners_Institutions_Names: list(row, C.partnerInstitutions),
-    Partners_Institutions_Websites: list(row, C.partnerWebsites),
-    Networks_Names: list(row, C.networks),
-    Networks_websites: list(row, C.networkWebsites)
-  }))
+  const items = rows.map(({ row }) => {
+    const name = cell(row, C.name)
+    return {
+      country: cell(row, C.country),
+      name,
+      latitude: cell(row, C.latitude),
+      longitude: cell(row, C.longitude),
+      websites: urls(row, C.website),
+      piNames: list(row, C.piNames),
+      // [{ name, url }]; url is null when names and websites do not pair up
+      institutions: linked(list(row, C.piInstitutions), urls(row, C.supportWebsites), name, 'supporting institutions'),
+      funders: list(row, C.funders),
+      partnerNames: list(row, C.partnerNames),
+      partnerInstitutions: linked(list(row, C.partnerInstitutions), urls(row, C.partnerWebsites), name, 'partner institutions'),
+      networks: linked(list(row, C.networks), urls(row, C.networkWebsites), name, 'networks')
+    }
+  })
   return groupBy(items, 'country')
 }

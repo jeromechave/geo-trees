@@ -80,8 +80,10 @@
         <p class="panel-coordinates">{{ selected.lat }}, {{ selected.lon }}</p>
         <p v-if="selected.description" class="panel-description">{{ selected.description }}</p>
       </div>
-      <div v-if="selected.url || hasDirectoryEntry(selected)" class="panel-links">
-        <a v-if="selected.url" :href="selected.url" target="_blank" rel="noopener">Visit the site’s website</a>
+      <div v-if="selected.urls.length || hasDirectoryEntry(selected)" class="panel-links">
+        <a v-for="(url, i) in selected.urls" :key="i" :href="url" target="_blank" rel="noopener">
+          {{ selected.urls.length === 1 ? 'Visit the site’s website' : `Visit ${linkLabels(selected.urls)[i]}` }}
+        </a>
         <button v-if="hasDirectoryEntry(selected)" type="button" @click="emit('show-in-directory', selected.slug)">
           See in the site directory
         </button>
@@ -98,7 +100,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { MAP_FALLBACK_LAYER, MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS } from '@/config'
-import { loadMapSites, slugify } from '@/lib/sheets'
+import { linkLabels, loadMapSites, slugify } from '@/lib/sheets'
 import { loadLeaflet, loadVectorSupport, supportsWebGL } from '@/lib/leaflet'
 import { repel } from '@/lib/repel'
 

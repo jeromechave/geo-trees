@@ -54,33 +54,51 @@
                   <div class="site-details-item-row" v-if="mapSlugs.has(slugify(site.name))">
                     <button type="button" class="show-on-map" @click="showOnMap(site)">Show on map</button>
                   </div>
-                  <div class="site-details-item-row" v-if="site.Website!=''">
+                  <div class="site-details-item-row" v-if="site.websites.length > 0">
                     <span class="site-details-item-label">Website: </span>
-                    <a class="site-details-item-value" :href="site.Website" target="_blank">visit</a>
+                    <a
+                      v-for="(url, i) in site.websites"
+                      :key="i"
+                      class="site-details-item-value"
+                      :href="url"
+                      target="_blank"
+                      rel="noopener"
+                    >{{ site.websites.length === 1 ? 'visit' : linkLabels(site.websites)[i] }}</a>
                   </div>
-                  <div class="site-details-item-row" v-if="site.PI_Names.length>0">
+                  <div class="site-details-item-row" v-if="site.piNames.length > 0">
                     <span class="site-details-item-label">PI Names: </span>
-                    <span class="site-details-item-value" v-for="(Names, position) in site.PI_Names" :key="position">{{ Names }}</span>
+                    <span class="site-details-item-value" v-for="(piName, i) in site.piNames" :key="i">{{ piName }}</span>
                   </div>
-                  <div class="site-details-item-row" v-if="site.PI_Institutions_Names.length>0">
+                  <div class="site-details-item-row" v-if="site.institutions.length > 0">
                     <span class="site-details-item-label">Supporting Institutions: </span>
-                    <a class="site-details-item-value" v-for="(Institutions_Names, i) in site.PI_Institutions_Names" :key="i" :href="site.Support_Institutions_websites[i]" target="_blank">{{ Institutions_Names }}</a>
+                    <template v-for="(item, i) in site.institutions" :key="i">
+                      <a v-if="item.url" class="site-details-item-value" :href="item.url" target="_blank" rel="noopener">{{ item.name }}</a>
+                      <span v-else class="site-details-item-value">{{ item.name }}</span>
+                    </template>
                   </div>
-                  <!-- <div class="site-details-item-row" v-if="site.Funders.length>0">
+                  <!-- Funders and partners are not shown (as on the previous site). To show them:
+                  <div class="site-details-item-row" v-if="site.funders.length > 0">
                     <span class="site-details-item-label">Funders: </span>
-                    <span class="site-details-item-value" v-for="(Funders, position) in site.Funders" :key="position">{{ Funders }}</span>
-                  </div
-                  <div class="site-details-item-row" v-if="site.Partners_Names.length>0">
-                    <span class="site-details-item-label">Partners Names: </span>
-                    <span class="site-details-item-value" v-for="(Names, position) in site.Partners_Names" :key="position">{{ Names }}</span>
+                    <span class="site-details-item-value" v-for="(funder, i) in site.funders" :key="i">{{ funder }}</span>
                   </div>
-                  <div class="site-details-item-row" v-if="site.Partners_Institutions_Names.length>0">
+                  <div class="site-details-item-row" v-if="site.partnerNames.length > 0">
+                    <span class="site-details-item-label">Partners Names: </span>
+                    <span class="site-details-item-value" v-for="(partner, i) in site.partnerNames" :key="i">{{ partner }}</span>
+                  </div>
+                  <div class="site-details-item-row" v-if="site.partnerInstitutions.length > 0">
                     <span class="site-details-item-label">Partners Institutions: </span>
-                    <a class="site-details-item-value" v-for="(Partners_Institutions_Names, i) in site.Partners_Institutions_Names" :key="i" :href="site.Partners_Institutions_Websites[i]" target="_blank">{{ Partners_Institutions_Names }}</a>
-                  </div>  -->
-                  <div class="site-details-item-row" v-if="site.Networks_Names.length>0">
+                    <template v-for="(item, i) in site.partnerInstitutions" :key="i">
+                      <a v-if="item.url" class="site-details-item-value" :href="item.url" target="_blank" rel="noopener">{{ item.name }}</a>
+                      <span v-else class="site-details-item-value">{{ item.name }}</span>
+                    </template>
+                  </div>
+                  -->
+                  <div class="site-details-item-row" v-if="site.networks.length > 0">
                     <span class="site-details-item-label">Networks: </span>
-                    <a class="site-details-item-value" v-for="(Networks_Names, i) in site.Networks_Names" :key="i" :href="site.Networks_websites[i]" target="_blank">{{ Networks_Names }}</a>
+                    <template v-for="(item, i) in site.networks" :key="i">
+                      <a v-if="item.url" class="site-details-item-value" :href="item.url" target="_blank" rel="noopener">{{ item.name }}</a>
+                      <span v-else class="site-details-item-value">{{ item.name }}</span>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -99,7 +117,7 @@ import SiteHeader from '@/components/SiteHeader.vue'
 import SheetError from '@/components/SheetError.vue'
 import SitesMap from '@/components/SitesMap.vue'
 import { useSheet } from '@/composables/useSheet'
-import { loadSites, slugify } from '@/lib/sheets'
+import { linkLabels, loadSites, slugify } from '@/lib/sheets'
 
 const { data: sitesData, error } = useSheet(loadSites)
 
@@ -264,6 +282,7 @@ function showOnMap(site) {
     border: 0;
     background: none;
     font: inherit;
+    font-family: "Lato-Regular", sans-serif; // buttons do not inherit the page font by default
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 3px;
