@@ -25,22 +25,6 @@
         </ul>
       </div>
 
-      <div class="sites-map-filters" role="group" aria-label="Filter by status">
-        <button
-          v-for="status in SITE_STATUSES"
-          :key="status.id"
-          type="button"
-          class="sites-map-filter"
-          :class="{ off: !visibleStatuses[status.id] }"
-          :aria-pressed="visibleStatuses[status.id] ? 'true' : 'false'"
-          @click="toggleStatus(status.id)"
-        >
-          <span class="swatch" :class="'fill-' + status.fill" :style="{ '--c': status.color }" aria-hidden="true"></span>
-          {{ status.label }}
-          <span class="count">{{ counts[status.id] }}</span>
-        </button>
-      </div>
-
       <div class="sites-map-legend">
         <div class="legend-bar" aria-hidden="true">
           <span v-for="measurement in MEASUREMENTS" :key="measurement.id" class="legend-square">
@@ -112,8 +96,8 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
-import { MAP_FALLBACK_LAYER, MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS, SITE_STATUSES } from '@/config'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { MAP_FALLBACK_LAYER, MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS } from '@/config'
 import { loadMapSites, slugify } from '@/lib/sheets'
 import { loadLeaflet, loadVectorSupport, supportsWebGL } from '@/lib/leaflet'
 import { repel } from '@/lib/repel'
@@ -142,7 +126,6 @@ const query = ref('')
 const selected = shallowRef(null)
 const activeLayer = ref(MAP_LAYERS[0].id)
 const zoom = ref(0)
-const visibleStatuses = reactive(Object.fromEntries(SITE_STATUSES.map((status) => [status.id, true])))
 
 let L
 let markerLayer
@@ -152,10 +135,6 @@ const markers = new Map() // site.id -> Leaflet marker
 const stateOf = (site, measurement) => MEASUREMENT_STATES.find((state) => state.id === site.measurements[measurement.id])
 const showLabels = computed(() => zoom.value >= LABEL_ZOOM)
 const hasDirectoryEntry = (site) => props.directorySlugs.has(site.slug)
-
-const counts = computed(() =>
-  Object.fromEntries(SITE_STATUSES.map((status) => [status.id, sites.value.filter((site) => site.status === status.id).length]))
-)
 
 const searchResults = computed(() => {
   const words = slugify(query.value)
@@ -167,21 +146,6 @@ const searchResults = computed(() => {
     .sort((a, b) => a.name.localeCompare(b.name))
     .slice(0, 8)
 })
-
-// First click on a status when all are shown keeps only that one;
-// after that, clicks toggle (at least one status always stays visible).
-function toggleStatus(id) {
-  const shown = SITE_STATUSES.filter((status) => visibleStatuses[status.id])
-  if (shown.length === SITE_STATUSES.length) {
-    SITE_STATUSES.forEach((status) => { visibleStatuses[status.id] = status.id === id })
-  } else if (!visibleStatuses[id]) {
-    visibleStatuses[id] = true
-  } else if (shown.length > 1) {
-    visibleStatuses[id] = false
-  } else {
-    SITE_STATUSES.forEach((status) => { visibleStatuses[status.id] = true })
-  }
-}
 
 // A site is drawn with two markers: in a layer below all bars, a dot at its true
 // position and a leader line to its bar (shown only when the bar had to move to
@@ -247,7 +211,6 @@ function renderMarkers() {
   markerLayer.clearLayers()
   markers.clear()
   sites.value
-    .filter((site) => visibleStatuses[site.status])
     .forEach((site) => {
       const marker = L.marker([site.lat, site.lon], {
         icon: L.divIcon({ className: 'site-marker', html: markerHtml(site), iconSize: [BAR.width, BAR.height] }),
@@ -293,7 +256,6 @@ function resetView() {
 
 function selectSite(site, { fly = false } = {}) {
   query.value = ''
-  if (!visibleStatuses[site.status]) visibleStatuses[site.status] = true
   selected.value = selected.value === site && !fly ? null : site
   if (selected.value && fly) {
     nextTick(() => {
@@ -309,7 +271,7 @@ function flyToSite(latLng) {
   const zoomLevel = Math.max(map.value.getZoom(), 7)
   let target = latLng
   if (window.matchMedia('(max-width: 700px)').matches) {
-    const offset = map.value.getSize().y * 0.28
+    const offset = map.value.getSize().y * 0.2
     target = map.value.unproject(map.value.project(latLng, zoomLevel).add([0, offset]), zoomLevel)
   }
   map.value.flyTo(target, zoomLevel, { duration: 1.2 })
@@ -331,12 +293,6 @@ watch(selected, (site) => {
     const element = marker.getElement()
     if (element) element.classList.toggle('selected', Boolean(site) && site.id === id)
   })
-})
-
-watch(visibleStatuses, () => {
-  if (selected.value && !visibleStatuses[selected.value.status]) selected.value = null
-  renderMarkers()
-  fitAll()
 })
 
 // Background layers are created the first time they are shown
@@ -617,31 +573,6 @@ $light: #F3F5E5;
   .result-country { font-style: italic; opacity: 0.75; }
   .no-result { padding: 9px 14px; font-style: italic; }
 }
-.sites-map-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.sites-map-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 10px;
-  border: 0;
-  border-radius: 4px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(33, 48, 67, 0.2);
-  font-size: 13px;
-
-  .count {
-    font-family: "Lato-Bold", sans-serif;
-  }
-  &.off {
-    background: rgba(255, 255, 255, 0.7);
-    color: rgba(33, 48, 67, 0.55);
-    .swatch { opacity: 0.35; }
-  }
-}
 .swatch {
   display: inline-block;
   width: 10px;
@@ -775,47 +706,47 @@ $light: #F3F5E5;
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 12px 14px 20px;
+  padding: 10px 10px 10px 16px;
   background: $navy;
   color: #fff;
 
   .panel-name {
     flex: 1;
     margin: 0;
-    padding-top: 2px;
+    padding-top: 3px;
     font-family: "Lato-Bold", sans-serif;
-    font-size: 19px;
-    line-height: 1.25;
+    font-size: 15px;
+    line-height: 1.3;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     overflow-wrap: anywhere; // long names wrap instead of widening the panel
   }
   .panel-close {
     flex: none;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     border: 0;
     background: none;
     color: #fff;
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1;
   }
 }
 .panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 14px 20px 16px;
+  padding: 11px 16px 13px;
 
   p { margin: 0; }
-  .panel-country { font-style: italic; }
-  .panel-coordinates { margin-top: 2px; font-size: 12px; letter-spacing: 0.05em; opacity: 0.75; }
-  .panel-description { margin-top: 12px; font-size: 14px; line-height: 1.6; }
+  .panel-country { font-size: 13px; line-height: 1.4; font-style: italic; }
+  .panel-coordinates { margin-top: 1px; font-size: 11px; letter-spacing: 0.05em; opacity: 0.75; }
+  .panel-description { margin-top: 10px; font-size: 13px; line-height: 1.55; }
 }
 .panel-links {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px 20px;
+  gap: 6px;
+  padding: 11px 16px;
   background: $light;
 
   a, button {
@@ -824,7 +755,7 @@ $light: #F3F5E5;
     background: none;
     color: $navy;
     font-family: "Lato-Bold", sans-serif;
-    font-size: 15px;
+    font-size: 13px;
     text-align: left;
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -864,7 +795,6 @@ $light: #F3F5E5;
     left: 12px;
     width: calc(100% - 24px);
   }
-  .sites-map-filter { padding: 5px 8px; font-size: 12px; }
   .sites-map-layers {
     top: auto;
     right: auto;

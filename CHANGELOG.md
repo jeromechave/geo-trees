@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.11 (2026-10-24)
+
+### Changed
+- Smaller text in the site panel (name 15 px, country, description and links
+  13 px, coordinates 11 px).
+- On phones, the selected site is placed a little lower so its name clears the
+  legend.
+
+### Removed
+- The Completed / Ongoing / Planned filter buttons on the map. All sites are always
+  shown; the status column of the `Data` tab is still read but no longer displayed.
+
 ## 2.0.10 (2026-10-24)
 
 ### Changed

@@ -63,8 +63,7 @@ Each site is drawn as a bar of three squares, left to right: **ALS**, **TLS**,
 | `1`, `yes`, `x`, `done`, `completed`, `réalisé` | completed: filled, green |
 
 The fill level (empty, half, full) carries the state on its own, so the map can be
-read with colour blindness or in greyscale; the colours add a second cue. The
-status filters use the same three looks.
+read with colour blindness or in greyscale; the colours add a second cue.
 
 When bars would overlap, they push each other apart; a thin line links a moved
 bar to a dot at the site's true position. The layout is recalculated at every zoom.
