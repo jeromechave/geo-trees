@@ -56,7 +56,9 @@ export const MAP_FALLBACK_LAYER = {
   maxZoom: 19
 }
 
-// Colours shared by the measurement squares and the status filters
+// Colours shared by the measurement squares and the status filters.
+// Each state is also shown by how full its square is (empty, half, full), so it can
+// be read without telling colours apart (colour blindness, greyscale printing).
 const RED = '#D7372B'
 const ORANGE = '#F28E1C'
 const GREEN = '#53A034'
@@ -68,18 +70,21 @@ export const MEASUREMENT_STATES = [
     id: 'not-started',
     label: 'Not started',
     color: RED,
+    fill: 'empty',
     aliases: ['', '0', 'no', 'non', 'n', 'false', 'not started', 'todo', 'to do', 'futur', 'future', 'planned', 'prévu']
   },
   {
     id: 'ongoing',
     label: 'Ongoing',
     color: ORANGE,
+    fill: 'half',
     aliases: ['en cours', 'ongoing', 'in progress', 'started', 'partial', 'current']
   },
   {
     id: 'completed',
     label: 'Completed',
     color: GREEN,
+    fill: 'full',
     aliases: ['1', 'yes', 'y', 'x', 'oui', 'true', 'done', 'completed', 'complete', 'réalisé', 'terminé', 'fait']
   }
 ]
@@ -95,7 +100,7 @@ export const MEASUREMENTS = [
 // Site statuses (column F of the "Datas" tab), used by the filters. "aliases" are
 // the values accepted in the sheet (case, accents and extra spaces are ignored).
 export const SITE_STATUSES = [
-  { id: 'completed', label: 'Completed', color: GREEN, aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },
-  { id: 'ongoing', label: 'Ongoing', color: ORANGE, aliases: ['en cours', 'ongoing', 'in progress', 'current'] },
-  { id: 'planned', label: 'Planned', color: RED, aliases: ['futur', 'future', 'planned', 'prévu', 'prevu'] }
+  { id: 'completed', label: 'Completed', color: GREEN, fill: 'full', aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },
+  { id: 'ongoing', label: 'Ongoing', color: ORANGE, fill: 'half', aliases: ['en cours', 'ongoing', 'in progress', 'current'] },
+  { id: 'planned', label: 'Planned', color: RED, fill: 'empty', aliases: ['futur', 'future', 'planned', 'prévu', 'prevu'] }
 ]

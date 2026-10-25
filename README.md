@@ -58,9 +58,13 @@ Each site is drawn as a bar of three squares, left to right: **ALS**, **TLS**,
 
 | Cell value (case and accents ignored) | Square |
 | --- | --- |
-| empty, `0`, `no`, `not started`, `futur` | red: not started |
-| `en cours`, `ongoing`, `in progress`, `started`, `partial` | orange: ongoing |
-| `1`, `yes`, `x`, `done`, `completed`, `réalisé` | green: completed |
+| empty, `0`, `no`, `not started`, `futur` | not started: empty, red outline |
+| `en cours`, `ongoing`, `in progress`, `started`, `partial` | ongoing: half filled, orange |
+| `1`, `yes`, `x`, `done`, `completed`, `réalisé` | completed: filled, green |
+
+The fill level (empty, half, full) carries the state on its own, so the map can be
+read with colour blindness or in greyscale; the colours add a second cue. The
+status filters use the same three looks.
 
 When bars would overlap, they push each other apart; a thin line links a moved
 bar to a dot at the site's true position. The layout is recalculated at every zoom.

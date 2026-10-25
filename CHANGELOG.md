@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.5 (2026-10-24)
+
+### Changed
+- Each state is shown by fill level as well as colour: not started is an empty
+  square with a red outline, ongoing is half filled in orange, completed is filled
+  in green. The map can now be read with colour blindness (with the colours alone,
+  red and green look the same to people with deuteranopia) and in greyscale.
+  Filters, legend and site panel use the same three looks.
+- Smaller site bars: 8 px squares with 1 px white borders (28 × 10 px instead of
+  38 × 14 px).
+- Bars keep 5 px between them, so a hovered or selected bar (shown 20% larger)
+  never touches its neighbours.
+
 ## 2.0.4 (2026-10-24)
 
 ### Changed

@@ -35,7 +35,7 @@
           :aria-pressed="visibleStatuses[status.id] ? 'true' : 'false'"
           @click="toggleStatus(status.id)"
         >
-          <span class="swatch" :style="{ color: status.color }" aria-hidden="true"></span>
+          <span class="swatch" :class="'fill-' + status.fill" :style="{ '--c': status.color }" aria-hidden="true"></span>
           {{ status.label }}
           <span class="count">{{ counts[status.id] }}</span>
         </button>
@@ -53,7 +53,7 @@
         </p>
         <ul class="legend-states">
           <li v-for="state in MEASUREMENT_STATES" :key="state.id">
-            <span class="swatch" :style="{ color: state.color }" aria-hidden="true"></span>{{ state.label }}
+            <span class="swatch" :class="'fill-' + state.fill" :style="{ '--c': state.color }" aria-hidden="true"></span>{{ state.label }}
           </li>
         </ul>
       </div>
@@ -88,7 +88,7 @@
       :aria-label="selected.name"
     >
       <div class="panel-status">
-        <span class="swatch" :style="{ color: statusOf(selected).color }" aria-hidden="true"></span>
+        <span class="swatch" :class="'fill-' + statusOf(selected).fill" :style="{ '--c': statusOf(selected).color }" aria-hidden="true"></span>
         <span class="status-text">{{ statusOf(selected).label }}</span>
         <span v-if="selected.date" class="status-date">{{ selected.date }}</span>
         <button type="button" class="panel-close" aria-label="Close" @click="closePanel">×</button>
@@ -102,7 +102,12 @@
         <p class="panel-measurements-title">Measurements:</p>
         <ul class="panel-measurements">
           <li v-for="measurement in MEASUREMENTS" :key="measurement.id">
-            <span class="swatch" :style="{ color: stateOf(selected, measurement).color }" aria-hidden="true"></span>
+            <span
+              class="swatch"
+              :class="'fill-' + stateOf(selected, measurement).fill"
+              :style="{ '--c': stateOf(selected, measurement).color }"
+              aria-hidden="true"
+            ></span>
             <span class="measurement-name">{{ measurement.label }} ({{ measurement.short }})</span>
             <span class="measurement-state">{{ stateOf(selected, measurement).label }}</span>
           </li>
@@ -139,7 +144,8 @@ const emit = defineEmits(['sites-loaded', 'show-in-directory'])
 const LABEL_ZOOM = 5 // site names appear from this zoom level
 
 // Size of a site's bar in pixels (keep in sync with .site-bar in the styles)
-const BAR = { width: 38, height: 14 }
+// 3 squares of 8 px + 1 px white border around and between them
+const BAR = { width: 28, height: 10 }
 // Site name above the bar: height, gap to the bar, and font used to measure it
 const LABEL = { height: 22, gap: 6, font: '12px Lato-Bold, sans-serif', padding: 18 }
 
@@ -204,8 +210,10 @@ function markerHtml(site) {
   const label = document.createElement('span')
   label.className = 'site-marker-label'
   label.textContent = site.name // textContent: names from the sheet are never parsed as HTML
-  const squares = MEASUREMENTS.map((measurement) =>
-    `<span class="site-bar-square" style="background:${stateOf(site, measurement).color}"></span>`).join('')
+  const squares = MEASUREMENTS.map((measurement) => {
+    const state = stateOf(site, measurement)
+    return `<span class="site-bar-square fill-${state.fill}" style="--c:${state.color}"></span>`
+  }).join('')
   return `<span class="site-marker-body">${label.outerHTML}<span class="site-bar">${squares}</span></span>`
 }
 
@@ -236,7 +244,8 @@ function layoutMarkers() {
     const height = BAR.height + LABEL.gap + LABEL.height
     return { x: point.x, y: point.y - (height - BAR.height) / 2, width: Math.max(BAR.width, labelWidth(site)), height }
   })
-  const offsets = repel(items)
+  // 5 px between bars, so a hovered or selected (enlarged) bar never touches another
+  const offsets = repel(items, { gap: 5 })
   entries.forEach(({ marker, leaderMarker }, i) => {
     const element = marker.getElement()
     const leaderElement = leaderMarker.getElement()
@@ -493,25 +502,24 @@ $light: #F3F5E5;
   position: absolute;
   inset: 0;
   display: flex;
-  gap: 2px;
-  padding: 2px;
+  gap: 1px;
+  padding: 1px;
   background: #fff;
-  border-radius: 2px;
-  box-shadow: 0 1px 4px rgba(33, 48, 67, 0.5);
+  border-radius: 1px;
+  box-shadow: 0 1px 3px rgba(33, 48, 67, 0.55);
   box-sizing: border-box;
   transition: transform 0.15s ease-out;
 }
 .site-bar-square {
   flex: 1;
-  border-radius: 1px;
 }
 .site-marker:hover .site-bar,
 .site-marker:focus-visible .site-bar,
 .site-marker.selected .site-bar {
-  transform: scale(1.18);
+  transform: scale(1.2); // grows 2.5 px per side: less than the spacing kept by layoutMarkers()
 }
 .site-marker.selected .site-bar {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px $navy;
+  box-shadow: 0 0 0 1px #fff, 0 0 0 2.5px $navy;
 }
 // shown when the bar was moved away from the site's real position
 .site-marker-anchor {
@@ -549,7 +557,7 @@ $light: #F3F5E5;
 }
 .site-marker-label {
   position: absolute;
-  bottom: 20px; // bar height + gap (LABEL.gap in the script)
+  bottom: 16px; // bar height + gap (BAR.height + LABEL.gap in the script)
   left: 50%;
   transform: translateX(-50%);
   padding: 3px 9px;
@@ -654,9 +662,20 @@ $light: #F3F5E5;
   display: inline-block;
   width: 10px;
   height: 10px;
-  background: currentColor;
-  border-radius: 1px;
   flex: none;
+}
+// State shown by fill level as well as colour (see MEASUREMENT_STATES in config.js):
+// --c is the state's colour, set inline
+.fill-empty {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--c);
+}
+.fill-half {
+  background: linear-gradient(to top, var(--c) 50%, #fff 50%);
+  box-shadow: inset 0 0 0 1.5px var(--c);
+}
+.fill-full {
+  background: var(--c);
 }
 
 .sites-map-legend {
@@ -776,7 +795,7 @@ $light: #F3F5E5;
   background: $navy;
   color: #fff;
 
-  .swatch { width: 11px; height: 11px; box-shadow: 0 0 0 1.5px #fff; }
+  .swatch { width: 11px; height: 11px; outline: 1.5px solid #fff; }
   .status-text { font-family: "Lato-Bold", sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
   .status-date { opacity: 0.8; font-size: 14px; }
   .panel-close {
