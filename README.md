@@ -86,8 +86,7 @@ bar to a dot at the site's true position. The layout is recalculated at every zo
 Rows without valid coordinates are left off the map (they still appear in the
 directory) and an unknown G/H/I value is shown as planned; both are reported in the
 browser console (View → Developer → JavaScript Console). Accepted words and colours
-are in `src/config.js` (`MEASUREMENT_STATES`); the column positions are in
-`DATA_COLUMNS`.
+are in `src/config.js` (`MEASUREMENT_STATES`); the columns are in `SHEET_COLUMNS`.
 
 **Map and directory.** Each site on the map has "See in the site directory", and
 each directory entry has "Show on map".
@@ -143,9 +142,13 @@ afterwards so they are not lost if someone deploys with `--clean`.
 All content comes from the Geotrees_Back-CARTO spreadsheet
 (https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng),
 tabs `Data` (map and site directory), `Aboutus`, `Opportunities` and `News`;
-other tabs, including `Sitesdirectory`, are ignored. The tab names and column
-order must stay as they are; if a tab is renamed, update `SHEET_TABS` in
-`src/config.js`. The spreadsheet must be shared as
+other tabs, including `Sitesdirectory`, are ignored. Tab names must stay as they are; if a tab is renamed, update `SHEET_TABS` in
+`src/config.js`. Columns are found by their header in row 1 (case, accents, spaces
+and underscores ignored), so they can be moved and new ones inserted. If a header
+is renamed, the site uses the column's usual position and says so in the browser
+console; the accepted header names are listed in `SHEET_COLUMNS` in
+`src/config.js`. Only `https:`, `http:` and `mailto:` addresses become links.
+The spreadsheet must be shared as
 **Anyone with the link: Viewer**, because visitors' browsers read it directly.
 
 To use another spreadsheet without changing the code, set in `.env.local` or the

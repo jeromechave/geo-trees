@@ -16,29 +16,60 @@ export const SHEET_TABS = {
   news: 'News'
 }
 
-// Columns of the Data tab (0 = column A), one row per site
-export const DATA_COLUMNS = {
-  name: 0, //                              A  Site
-  description: 1, //                       B  Description
-  country: 2, //                           C  Country
-  latitude: 3, //                          D  Latitude
-  longitude: 4, //                         E  Longitude
-  website: 5, //                           F  Site_URL
-  als: 6, //                               G  ALS
-  tls: 7, //                               H  TLS
-  plot: 8, //                              I  Inventory
-  piNames: 9, //                           J  PI_Names
-  piInstitutions: 10, //                   K  PI_Institutions_Names
-  supportWebsites: 11, //                  L  Support_Institutions_websites
-  funders: 12, //                          M  Funders
-  partnerNames: 13, //                     N  Partners_Names
-  partnerInstitutions: 14, //              O  Partners_Institutions_Names
-  partnerWebsites: 15, //                  P  Partners_Institutions_Websites
-  networks: 16, //                         Q  Networks_Names
-  networkWebsites: 17 //                   R  Networks_websites
-  // S (PI email addresses) and T (update notes) are never read by the website
+// Columns of each tab, listed in their usual order (the first is column A).
+// The site finds each column by its header in row 1 (case, accents, spaces and
+// underscores ignored), so columns can be moved or inserted. If no header matches,
+// it uses the usual position and says so in the browser console.
+// Each field lists the header names it accepts.
+export const SHEET_COLUMNS = {
+  data: {
+    name: ['Site'],
+    description: ['Description'],
+    country: ['Country'],
+    latitude: ['Latitude'],
+    longitude: ['Longitude'],
+    website: ['Site_URL', 'Website'],
+    als: ['ALS'],
+    tls: ['TLS'],
+    plot: ['Inventory', 'Plot'],
+    piNames: ['PI_Names'],
+    piInstitutions: ['PI_Institutions_Names'],
+    supportWebsites: ['Support_Institutions_websites'],
+    funders: ['Funders'],
+    partnerNames: ['Partners_Names'],
+    partnerInstitutions: ['Partners_Institutions_Names'],
+    partnerWebsites: ['Partners_Institutions_Websites'],
+    networks: ['Networks_Names'],
+    networkWebsites: ['Networks_websites']
+    // PI email addresses and update notes are never read by the website
+  },
+  about: {
+    display: ['display'],
+    name: ['name'],
+    group: ['group'],
+    role: ['role'],
+    affiliation: ['affiliation'],
+    image: ['image'],
+    zoom: ['zoom'],
+    link: ['link']
+  },
+  news: {
+    date: ['Date'],
+    title: ['Title'],
+    text: ['Text'],
+    linkText: ['Link_text'],
+    linkUrl: ['Link_url'],
+    image: ['Img_url', 'Image']
+  },
+  opportunities: {
+    category: ['Categorie', 'Category'],
+    date: ['Date'],
+    title: ['Title'],
+    text: ['Text'],
+    linkText: ['Link_text'],
+    linkUrl: ['Link_url']
+  }
 }
-export const DATA_LAST_COLUMN = 'R'
 
 // The Data tab (map and site directory) is read from the same spreadsheet unless set otherwise
 export const MAP_SPREADSHEET_ID = import.meta.env.VITE_MAP_SPREADSHEET_ID || SPREADSHEET_ID
@@ -128,9 +159,9 @@ export const MEASUREMENT_STATES = [
   }
 ]
 
-// The three squares of each site's bar, left to right, and their Data column
+// The three squares of each site's bar, left to right, and their Data field
 export const MEASUREMENTS = [
-  { id: 'als', short: 'ALS', label: 'Airborne laser scanning', column: DATA_COLUMNS.als },
-  { id: 'tls', short: 'TLS', label: 'Terrestrial laser scanning', column: DATA_COLUMNS.tls },
-  { id: 'plot', short: 'Plot', label: 'Forest plot inventory', column: DATA_COLUMNS.plot }
+  { id: 'als', short: 'ALS', label: 'Airborne laser scanning', field: 'als' },
+  { id: 'tls', short: 'TLS', label: 'Terrestrial laser scanning', field: 'tls' },
+  { id: 'plot', short: 'Plot', label: 'Forest plot inventory', field: 'plot' }
 ]

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.17 (2026-10-24)
+
+### Changed
+- Spreadsheet columns are found by their header in row 1 instead of by position,
+  in every tab: columns can be moved or inserted without misplacing data. If a
+  header is renamed, the usual position is used and the browser console says
+  which header to check. Accepted headers are in `SHEET_COLUMNS` (`src/config.js`).
+  Each tab is read in two requests (header row, then data), still never beyond the
+  last column the site uses.
+- Images load lazily (only when scrolled near), and decode without blocking the page.
+
+### Security
+- Only `https:`, `http:` and `mailto:` addresses from the sheet become links; any
+  other (e.g. `javascript:`) is ignored and reported in the console.
+
+### Fixed
+- Partner logos without a website are no longer links to the current page.
+- Console messages about sheet rows give the right row number when the tab has
+  empty rows.
+
 ## 2.0.16 (2026-10-24)
 
 ### Changed

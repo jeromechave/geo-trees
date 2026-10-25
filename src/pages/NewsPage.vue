@@ -14,7 +14,7 @@
         <SheetError v-if="error" />
         <div class="news-item" v-for="(news, position) in newsData" :key="position">
           <div class="news-item-image">
-            <img :src="news.img_url" alt=""/>
+            <img loading="lazy" decoding="async" :src="news.img_url" alt=""/>
           </div>
           <div class="news-item-content">
             <div class="news-item-title">{{ news.title }}</div>

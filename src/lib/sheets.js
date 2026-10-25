@@ -1,9 +1,8 @@
 import {
-  DATA_COLUMNS as C,
-  DATA_LAST_COLUMN,
   MAP_SPREADSHEET_ID,
   MEASUREMENT_STATES,
   MEASUREMENTS,
+  SHEET_COLUMNS,
   SHEET_TABS,
   SHEETS_API_KEY,
   SPREADSHEET_ID
@@ -26,13 +25,24 @@ const list = (row, i) => splitItems(cell(row, i))
 // A cell of web addresses, separated by ";" like other lists (an address may contain
 // spaces, e.g. a PDF name). "www.example.org" gets "https://", otherwise the browser
 // would treat it as a page of this website.
+// Only these kinds of address are turned into links: a "javascript:" or other
+// address typed into the sheet is ignored (it could run code in visitors' browsers).
+const SAFE_URL = /^(https?:\/\/|mailto:)/i
 const withScheme = (url) => (/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`)
-const urls = (row, i) => list(row, i).map(withScheme)
+// -> list of addresses; an unsafe one becomes null, so the others keep their position
+const urls = (row, i, where = 'Sheet') =>
+  list(row, i).map((item) => {
+    const url = withScheme(item)
+    if (SAFE_URL.test(url)) return url
+    console.warn(`${where}: link "${item}" ignored (only https, http and mailto links are allowed).`)
+    return null
+  })
 
 // Short labels for a list of web addresses: "example.org", or "example.org/en/page"
 // when two addresses of the list are on the same site.
 export function linkLabels(addresses) {
   const parts = addresses.map((url) => {
+    if (!url) return { host: '', path: '' }
     try {
       const { hostname, pathname } = new URL(url)
       return { host: hostname.replace(/^www\./, ''), path: pathname.replace(/\/$/, '') }
@@ -58,7 +68,7 @@ function linked(names, addresses, where, what) {
   return Array.from({ length: Math.max(names.length, addresses.length) }, (_, index) => ({
     name: names[index] || labels[index],
     url: addresses[index] || null
-  }))
+  })).filter((link) => link.name)
 }
 
 const groupBy = (items, key) =>
@@ -67,7 +77,7 @@ const groupBy = (items, key) =>
     return groups
   }, {})
 
-async function fetchRange(range, spreadsheetId = SPREADSHEET_ID) {
+async function fetchRange(range, spreadsheetId) {
   const url =
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet` +
     `?ranges=${encodeURIComponent(range)}&key=${SHEETS_API_KEY}`
@@ -76,45 +86,94 @@ async function fetchRange(range, spreadsheetId = SPREADSHEET_ID) {
     throw new Error(`Google Sheets answered ${response.status} for "${range}"`)
   }
   const body = await response.json()
-  const rows = body.valueRanges[0].values || []
-  // skip completely empty rows
-  return rows.filter((row) => row.some((value) => String(value).trim() !== ''))
+  return body.valueRanges[0].values || []
+}
+
+const normalizeHeader = (header) => slugify(header).replace(/-/g, '')
+
+// 0 -> "A", 25 -> "Z", 26 -> "AA"
+function columnLetter(index) {
+  let letters = ''
+  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) letters = String.fromCharCode(65 + ((n - 1) % 26)) + letters
+  return letters
+}
+
+// Reads one tab. Its header row is read first to find each column of SHEET_COLUMNS,
+// then only the rows up to the last column needed. Returns the non-empty rows, each
+// with its spreadsheet row number and functions to read a field as text, as a list
+// ("a; b") or as web addresses.
+async function readTab(tabKey, spreadsheetId = SPREADSHEET_ID) {
+  const tab = SHEET_TABS[tabKey]
+  const [header = []] = await fetchRange(`${tab}!1:1`, spreadsheetId)
+  const positions = new Map()
+  header.forEach((title, index) => {
+    const key = normalizeHeader(title)
+    if (key && !positions.has(key)) positions.set(key, index)
+  })
+  const columns = {}
+  Object.entries(SHEET_COLUMNS[tabKey]).forEach(([field, titles], usual) => {
+    const found = titles.map((title) => positions.get(normalizeHeader(title))).find((index) => index !== undefined)
+    if (found === undefined) {
+      console.warn(
+        `Sheet: no column "${titles[0]}" in tab "${tab}"; using column ${columnLetter(usual)} ` +
+          `("${header[usual] || 'no header'}") instead. Check the header in row 1.`
+      )
+    }
+    columns[field] = found === undefined ? usual : found
+  })
+  const last = columnLetter(Math.max(...Object.values(columns)))
+  const values = await fetchRange(`${tab}!A2:${last}10000`, spreadsheetId)
+  return values
+    .map((row, index) => ({ row, line: index + 2 }))
+    .filter(({ row }) => row.some((value) => String(value).trim() !== ''))
+    .map(({ row, line }) => ({
+      line,
+      text: (field) => cell(row, columns[field]),
+      list: (field) => list(row, columns[field]),
+      urls: (field, where) => urls(row, columns[field], where)
+    }))
 }
 
 export async function loadAbout() {
-  const rows = await fetchRange(`${SHEET_TABS.about}!A2:K10000`)
-  return rows.map((row) => ({
-    display: cell(row, 0),
-    name: cell(row, 1),
-    group: cell(row, 2),
-    role: cell(row, 3),
-    affiliation: cell(row, 4),
-    image: cell(row, 5),
-    zoom: cell(row, 6),
-    link: urls(row, 7)[0] || '' // one partner website
+  const rows = await readTab('about')
+  return rows.map((r) => ({
+    display: r.text('display'),
+    name: r.text('name'),
+    group: r.text('group'),
+    role: r.text('role'),
+    affiliation: r.text('affiliation'),
+    image: r.text('image'),
+    zoom: r.text('zoom'),
+    link: r.urls('link', `About us "${r.text('name')}"`).find(Boolean) || '' // one partner website
   }))
 }
 
 export async function loadNews() {
-  const rows = await fetchRange(`${SHEET_TABS.news}!A2:K10000`)
-  return rows.map((row) => ({
-    date: cell(row, 0),
-    title: cell(row, 1),
-    text: cell(row, 2),
-    links: linked(list(row, 3), urls(row, 4), `News "${cell(row, 1)}"`, 'link texts'),
-    img_url: cell(row, 5)
-  }))
+  const rows = await readTab('news')
+  return rows.map((r) => {
+    const where = `News "${r.text('title')}"`
+    return {
+      date: r.text('date'),
+      title: r.text('title'),
+      text: r.text('text'),
+      links: linked(r.list('linkText'), r.urls('linkUrl', where), where, 'link texts'),
+      img_url: r.urls('image', where).find(Boolean) || ''
+    }
+  })
 }
 
 export async function loadOpportunities() {
-  const rows = await fetchRange(`${SHEET_TABS.opportunities}!A2:K10000`)
-  const items = rows.map((row) => ({
-    categorie: cell(row, 0),
-    date: cell(row, 1),
-    title: cell(row, 2),
-    text: cell(row, 3),
-    links: linked(list(row, 4), urls(row, 5), `Opportunity "${cell(row, 2)}"`, 'link texts')
-  }))
+  const rows = await readTab('opportunities')
+  const items = rows.map((r) => {
+    const where = `Opportunity "${r.text('title')}"`
+    return {
+      categorie: r.text('category'),
+      date: r.text('date'),
+      title: r.text('title'),
+      text: r.text('text'),
+      links: linked(r.list('linkText'), r.urls('linkUrl', where), where, 'link texts')
+    }
+  })
   return groupBy(items, 'categorie')
 }
 
@@ -140,9 +199,7 @@ const coordinate = (value) => parseFloat(value.replace(',', '.'))
 // The Data tab: one row per site, read once and shared by the map and the directory
 let dataRows
 function loadDataRows() {
-  dataRows ||= fetchRange(`${SHEET_TABS.data}!A2:${DATA_LAST_COLUMN}10000`, MAP_SPREADSHEET_ID).then((rows) =>
-    rows.map((row, index) => ({ row, line: index + 2 })).filter(({ row }) => cell(row, C.name) !== '')
-  )
+  dataRows ||= readTab('data', MAP_SPREADSHEET_ID).then((rows) => rows.filter((r) => r.text('name') !== ''))
   return dataRows
 }
 
@@ -150,30 +207,30 @@ function loadDataRows() {
 export async function loadMapSites() {
   const rows = await loadDataRows()
   const sites = []
-  rows.forEach(({ row, line }) => {
-    const name = cell(row, C.name)
-    const lat = coordinate(cell(row, C.latitude))
-    const lon = coordinate(cell(row, C.longitude))
+  rows.forEach((r) => {
+    const name = r.text('name')
+    const lat = coordinate(r.text('latitude'))
+    const lon = coordinate(r.text('longitude'))
     if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
-      console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${line}) has no valid coordinates and is not shown.`)
+      console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${r.line}) has no valid coordinates and is not shown.`)
       return
     }
     sites.push({
-      id: `${slugify(name)}-${line}`,
+      id: `${slugify(name)}-${r.line}`,
       slug: slugify(name),
       name,
-      description: cell(row, C.description),
-      country: cell(row, C.country),
+      description: r.text('description'),
+      country: r.text('country'),
       lat,
       lon,
-      urls: urls(row, C.website),
+      urls: r.urls('website', `Map "${name}"`).filter(Boolean),
       // { als: 'completed', tls: 'ongoing', plot: 'not-started' }
       measurements: Object.fromEntries(
         MEASUREMENTS.map((measurement) => {
-          const value = cell(row, measurement.column)
+          const value = r.text(measurement.field)
           let state = MEASUREMENT_STATE_BY_ALIAS.get(normalizeWords(value))
           if (!state) {
-            console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
+            console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${r.line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
             state = 'not-started'
           }
           return [measurement.id, state]
@@ -187,21 +244,22 @@ export async function loadMapSites() {
 // Sites in the directory below the map, grouped by country
 export async function loadSites() {
   const rows = await loadDataRows()
-  const items = rows.map(({ row }) => {
-    const name = cell(row, C.name)
+  const items = rows.map((r) => {
+    const name = r.text('name')
+    const where = `Directory "${name}"`
     return {
-      country: cell(row, C.country),
+      country: r.text('country'),
       name,
-      latitude: cell(row, C.latitude),
-      longitude: cell(row, C.longitude),
-      websites: urls(row, C.website),
-      piNames: list(row, C.piNames),
-      // [{ name, url }]; url is null when names and websites do not pair up
-      institutions: linked(list(row, C.piInstitutions), urls(row, C.supportWebsites), `Directory "${name}"`, 'supporting institutions'),
-      funders: list(row, C.funders),
-      partnerNames: list(row, C.partnerNames),
-      partnerInstitutions: linked(list(row, C.partnerInstitutions), urls(row, C.partnerWebsites), `Directory "${name}"`, 'partner institutions'),
-      networks: linked(list(row, C.networks), urls(row, C.networkWebsites), `Directory "${name}"`, 'networks')
+      latitude: r.text('latitude'),
+      longitude: r.text('longitude'),
+      websites: r.urls('website', where).filter(Boolean),
+      piNames: r.list('piNames'),
+      // [{ name, url }]; url is null for a name without (a safe) web address
+      institutions: linked(r.list('piInstitutions'), r.urls('supportWebsites', where), where, 'supporting institutions'),
+      funders: r.list('funders'),
+      partnerNames: r.list('partnerNames'),
+      partnerInstitutions: linked(r.list('partnerInstitutions'), r.urls('partnerWebsites', where), where, 'partner institutions'),
+      networks: linked(r.list('networks'), r.urls('networkWebsites', where), where, 'networks')
     }
   })
   return groupBy(items, 'country')

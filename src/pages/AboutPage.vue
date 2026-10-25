@@ -12,7 +12,7 @@
     <div class="content-section section-light">
       <div class="content-wrapper">
         <h2>Governance</h2>
-        <img class="center" src="@/assets/governance-image-2.png" alt="GEO-TREES governance structure"/>
+        <img loading="lazy" decoding="async" class="center" src="@/assets/governance-image-2.png" alt="GEO-TREES governance structure"/>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
         <div class="team-member-list">
           <div class="team-member" v-for="(member, position) in executiveBoard" :class="member.group" :key="position">
             <div class="team-member-image">
-              <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
+              <img loading="lazy" decoding="async" :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
             </div>
             <h3>{{member.name}}</h3>
             <span  v-if="member.role" class="team-member-role">{{member.role}}</span>
@@ -35,7 +35,7 @@
         <div class="team-member-list">
           <div class="team-member" v-for="(member, position) in projectManager" :class="member.group" :key="position">
             <div class="team-member-image">
-              <img :src="sheetImage(member.image)" alt=""/>
+              <img loading="lazy" decoding="async" :src="sheetImage(member.image)" alt=""/>
             </div>
             <h3>{{member.name}}</h3>
             <span class="team-member-role">{{member.role}}</span>
@@ -47,7 +47,7 @@
         <div class="team-member-list">
           <div class="team-member" v-for="(member, position) in scientificBoard" :class="member.group" :key="position">
             <div class="team-member-image">
-              <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
+              <img loading="lazy" decoding="async" :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
             </div>
             <h3>{{member.name}}</h3>
             <span class="team-member-role">{{member.role}}</span>
@@ -57,7 +57,7 @@
 
         <h2>Network Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link"  target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link || null"  target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <!-- Community: hidden for now, kept for a later release (see SHOW_COMMUNITY below) -->
@@ -66,7 +66,7 @@
           <div class="community-member-list">
             <div class="community-member" v-for="(member, position) in community" :class="member.group" :key="position">
               <div class="community-member-image">
-                <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
+                <img loading="lazy" decoding="async" :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
               </div>
               <h3>{{member.name}}</h3>
               <span v-for="(r, position) in splitList(member.role)" :key="position" class="community-member-role">{{r}}</span>
@@ -78,12 +78,12 @@
         <h2>Site Partners</h2>
         <a href="https://geo-trees.org/sites.html">More information about the sites</a>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="(member, position) in sitePartners" :key="position" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in sitePartners" :key="position" :href="member.link || null" target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <h2>Supporting Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="(member, position) in supportingPartners" :key="position" :href="member.link" target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in supportingPartners" :key="position" :href="member.link || null" target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
       </div>
