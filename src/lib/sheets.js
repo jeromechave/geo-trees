@@ -1,4 +1,13 @@
-import { MAP_SPREADSHEET_ID, MEASUREMENT_STATES, MEASUREMENTS, SHEET_TABS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
+import {
+  DATA_COLUMNS as C,
+  DATA_LAST_COLUMN,
+  MAP_SPREADSHEET_ID,
+  MEASUREMENT_STATES,
+  MEASUREMENTS,
+  SHEET_TABS,
+  SHEETS_API_KEY,
+  SPREADSHEET_ID
+} from '@/config'
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -72,29 +81,8 @@ export async function loadOpportunities() {
   return groupBy(items, 'categorie')
 }
 
-export async function loadSites() {
-  const rows = await fetchRange(`${SHEET_TABS.directory}!A2:N10000`)
-  const items = rows.map((row) => ({
-    country: cell(row, 0),
-    name: cell(row, 1),
-    latitude: cell(row, 2),
-    longitude: cell(row, 3),
-    Website: cell(row, 4),
-    PI_Names: list(row, 5),
-    PI_Institutions_Names: list(row, 6),
-    Support_Institutions_websites: list(row, 7),
-    Funders: list(row, 8),
-    Partners_Names: list(row, 9),
-    Partners_Institutions_Names: list(row, 10),
-    Partners_Institutions_Websites: list(row, 11),
-    Networks_Names: list(row, 12),
-    Networks_websites: list(row, 13)
-  }))
-  return groupBy(items, 'country')
-}
-
-// "Lopé National Park" -> "lope-national-park". Used to match the same site
-// between the "Data" (map) and "Sitesdirectory" (directory) tabs.
+// "Lopé National Park" -> "lope-national-park". Used to link a site on the map to
+// its entry in the site directory, and to read sheet values tolerantly.
 export const slugify = (value) =>
   String(value || '')
     .normalize('NFD')
@@ -105,10 +93,6 @@ export const slugify = (value) =>
 
 const normalizeWords = (value) => slugify(value).replace(/-/g, ' ')
 
-const STATUS_BY_ALIAS = new Map(
-  SITE_STATUSES.flatMap((status) => status.aliases.map((alias) => [normalizeWords(alias), status.id]))
-)
-
 const MEASUREMENT_STATE_BY_ALIAS = new Map(
   MEASUREMENT_STATES.flatMap((state) => state.aliases.map((alias) => [normalizeWords(alias), state.id]))
 )
@@ -116,44 +100,43 @@ const MEASUREMENT_STATE_BY_ALIAS = new Map(
 // Accepts "-0.2" and "-0,2"
 const coordinate = (value) => parseFloat(value.replace(',', '.'))
 
-// "Data" tab: one row per site shown on the map
+// The Data tab: one row per site, read once and shared by the map and the directory
+let dataRows
+function loadDataRows() {
+  dataRows ||= fetchRange(`${SHEET_TABS.data}!A2:${DATA_LAST_COLUMN}10000`, MAP_SPREADSHEET_ID).then((rows) =>
+    rows.map((row, index) => ({ row, line: index + 2 })).filter(({ row }) => cell(row, C.name) !== '')
+  )
+  return dataRows
+}
+
+// Sites shown on the map
 export async function loadMapSites() {
-  const rows = await fetchRange(`${SHEET_TABS.map}!A2:K10000`, MAP_SPREADSHEET_ID)
+  const rows = await loadDataRows()
   const sites = []
-  rows.forEach((row, index) => {
-    const line = index + 2 // spreadsheet row number, for messages
-    const name = cell(row, 0)
-    const lat = coordinate(cell(row, 3))
-    const lon = coordinate(cell(row, 4))
-    if (!name) return
+  rows.forEach(({ row, line }) => {
+    const name = cell(row, C.name)
+    const lat = coordinate(cell(row, C.latitude))
+    const lon = coordinate(cell(row, C.longitude))
     if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
-      console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has no valid coordinates and is not shown.`)
+      console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${line}) has no valid coordinates and is not shown.`)
       return
-    }
-    const rawStatus = cell(row, 5)
-    let status = STATUS_BY_ALIAS.get(normalizeWords(rawStatus))
-    if (!status) {
-      console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has an unknown status "${rawStatus}"; shown as planned.`)
-      status = 'planned'
     }
     sites.push({
       id: `${slugify(name)}-${line}`,
       slug: slugify(name),
       name,
-      description: cell(row, 1),
-      country: cell(row, 2),
+      description: cell(row, C.description),
+      country: cell(row, C.country),
       lat,
       lon,
-      status,
-      date: cell(row, 6),
-      url: cell(row, 7),
+      url: cell(row, C.website),
       // { als: 'completed', tls: 'ongoing', plot: 'not-started' }
       measurements: Object.fromEntries(
         MEASUREMENTS.map((measurement) => {
           const value = cell(row, measurement.column)
           let state = MEASUREMENT_STATE_BY_ALIAS.get(normalizeWords(value))
           if (!state) {
-            console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
+            console.warn(`Map: "${name}" (${SHEET_TABS.data} row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
             state = 'not-started'
           }
           return [measurement.id, state]
@@ -162,4 +145,26 @@ export async function loadMapSites() {
     })
   })
   return sites
+}
+
+// Sites in the directory below the map, grouped by country
+export async function loadSites() {
+  const rows = await loadDataRows()
+  const items = rows.map(({ row }) => ({
+    country: cell(row, C.country),
+    name: cell(row, C.name),
+    latitude: cell(row, C.latitude),
+    longitude: cell(row, C.longitude),
+    Website: cell(row, C.website),
+    PI_Names: list(row, C.piNames),
+    PI_Institutions_Names: list(row, C.piInstitutions),
+    Support_Institutions_websites: list(row, C.supportWebsites),
+    Funders: list(row, C.funders),
+    Partners_Names: list(row, C.partnerNames),
+    Partners_Institutions_Names: list(row, C.partnerInstitutions),
+    Partners_Institutions_Websites: list(row, C.partnerWebsites),
+    Networks_Names: list(row, C.networks),
+    Networks_websites: list(row, C.networkWebsites)
+  }))
+  return groupBy(items, 'country')
 }

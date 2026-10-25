@@ -3,20 +3,44 @@
 // restricted in Google Cloud Console: see README, "Google Sheets API key".
 // Override at build time with VITE_SHEETS_API_KEY in a .env.local file.
 // The spreadsheet (Geotrees_Back-CARTO) must be shared as "Anyone with the link: Viewer".
-// It holds the tabs Data (the map), Aboutus, Sitesdirectory, Opportunities and News.
+// It holds the tabs Data (map and site directory), Aboutus, Opportunities and News.
 // https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng
 export const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID || '1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng'
 // Names of the spreadsheet tabs, exactly as shown at the bottom of the sheet.
-// If a tab is renamed in Google Sheets, rename it here too.
+// If a tab is renamed in Google Sheets, rename it here too. The Data tab can also be
+// set with VITE_DATA_TAB in .env.local (for example to try a copy of it first).
 export const SHEET_TABS = {
-  map: 'Data',
+  data: import.meta.env.VITE_DATA_TAB || 'Data', // the map and the site directory
   about: 'Aboutus',
-  directory: 'Sitesdirectory',
   opportunities: 'Opportunities',
   news: 'News'
 }
 
-// The map's "Data" tab is read from the same spreadsheet unless set otherwise
+// Columns of the Data tab (0 = column A), one row per site
+export const DATA_COLUMNS = {
+  name: 0, //                              A  Site
+  description: 1, //                       B  Description
+  country: 2, //                           C  Country
+  latitude: 3, //                          D  Latitude
+  longitude: 4, //                         E  Longitude
+  website: 5, //                           F  Site_URL
+  als: 6, //                               G  ALS
+  tls: 7, //                               H  TLS
+  plot: 8, //                              I  Inventory
+  piNames: 9, //                           J  PI_Names
+  piInstitutions: 10, //                   K  PI_Institutions_Names
+  supportWebsites: 11, //                  L  Support_Institutions_websites
+  funders: 12, //                          M  Funders
+  partnerNames: 13, //                     N  Partners_Names
+  partnerInstitutions: 14, //              O  Partners_Institutions_Names
+  partnerWebsites: 15, //                  P  Partners_Institutions_Websites
+  networks: 16, //                         Q  Networks_Names
+  networkWebsites: 17 //                   R  Networks_websites
+  // S (PI email addresses) and T (update notes) are never read by the website
+}
+export const DATA_LAST_COLUMN = 'R'
+
+// The Data tab (map and site directory) is read from the same spreadsheet unless set otherwise
 export const MAP_SPREADSHEET_ID = import.meta.env.VITE_MAP_SPREADSHEET_ID || SPREADSHEET_ID
 export const SHEETS_API_KEY = import.meta.env.VITE_SHEETS_API_KEY || 'AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0'
 
@@ -78,7 +102,7 @@ const RED = '#D7372B'
 const ORANGE = '#F28E1C'
 const GREEN = '#53A034'
 
-// State of each measurement (columns I, J, K of the "Data" tab). "aliases" are the
+// State of each measurement (columns G, H, I of the "Data" tab). "aliases" are the
 // values accepted in those cells; case, accents and extra spaces are ignored.
 export const MEASUREMENT_STATES = [
   {
@@ -104,18 +128,9 @@ export const MEASUREMENT_STATES = [
   }
 ]
 
-// The three squares of each site's bar, left to right, and their sheet column
-// (0 = column A, so 8 = column I)
+// The three squares of each site's bar, left to right, and their Data column
 export const MEASUREMENTS = [
-  { id: 'als', short: 'ALS', label: 'Airborne laser scanning', column: 8 },
-  { id: 'tls', short: 'TLS', label: 'Terrestrial laser scanning', column: 9 },
-  { id: 'plot', short: 'Plot', label: 'Forest plot inventory', column: 10 }
-]
-
-// Site statuses (column F of the "Data" tab), used by the filters. "aliases" are
-// the values accepted in the sheet (case, accents and extra spaces are ignored).
-export const SITE_STATUSES = [
-  { id: 'completed', label: 'Completed', color: GREEN, fill: 'full', aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },
-  { id: 'ongoing', label: 'Ongoing', color: ORANGE, fill: 'half', aliases: ['en cours', 'ongoing', 'in progress', 'current'] },
-  { id: 'planned', label: 'Planned', color: RED, fill: 'empty', aliases: ['futur', 'future', 'planned', 'prévu', 'prevu'] }
+  { id: 'als', short: 'ALS', label: 'Airborne laser scanning', column: DATA_COLUMNS.als },
+  { id: 'tls', short: 'TLS', label: 'Terrestrial laser scanning', column: DATA_COLUMNS.tls },
+  { id: 'plot', short: 'Plot', label: 'Forest plot inventory', column: DATA_COLUMNS.plot }
 ]

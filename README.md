@@ -40,27 +40,37 @@ of a domain instead, run `VITE_BASE=/ npm run build`.
 The map on the Sites page is part of this site (`src/components/SitesMap.vue`).
 It replaces the separate map previously embedded from `geo-trees.org/carto/`.
 
-**Data.** It reads the `Data` tab of the same Google Sheet, one row per site:
+**Data.** The map and the site directory below it both read the `Data` tab of the
+Google Sheet, one row per site:
 
-| Column | Content |
-| --- | --- |
-| A | Site name |
-| B | Description |
-| C | Country |
-| D, E | Latitude, longitude (decimal degrees; `5.27` or `5,27`) |
-| F | Status: `réalisé` / `completed`, `en cours` / `ongoing`, `futur` / `planned` (case and accents ignored) |
-| G | Date shown next to the status |
-| H | Website URL |
-| I, J, K | State of ALS, TLS and the forest plot inventory (see below) |
+| Column | Content | Used by |
+| --- | --- | --- |
+| A | Site (name) | map, directory |
+| B | Description | map |
+| C | Country | map, directory |
+| D, E | Latitude, Longitude (decimal degrees; `5.27` or `5,27`) | map, directory |
+| F | Site_URL | map, directory |
+| G, H, I | ALS, TLS, Inventory (see below) | map |
+| J | PI_Names | directory |
+| K | PI_Institutions_Names | directory |
+| L | Support_Institutions_websites | directory |
+| M | Funders | (hidden) |
+| N, O, P | Partners_Names, Partners_Institutions_Names, Partners_Institutions_Websites | (hidden) |
+| Q, R | Networks_Names, Networks_websites | directory |
+| S, T | PIs email adress, Ayala_updates_track | never read |
+
+Columns J–R hold lists separated by `;`. Format columns D and E as
+**Format → Number → Plain text** in Google Sheets: in a French-locale sheet, typing
+`4.08` in an automatic cell turns it into a date.
 
 Each site is drawn as a bar of three squares, left to right: **ALS**, **TLS**,
-**Plot** (forest plot inventory). Each square takes its colour from columns I, J, K:
+**Plot** (forest plot inventory). Each square takes its colour from columns G, H, I:
 
 | Cell value (case and accents ignored) | Square |
 | --- | --- |
-| empty, `0`, `no`, `not started`, `futur` | planned: empty, red outline |
-| `en cours`, `ongoing`, `in progress`, `started`, `partial` | ongoing: half filled, orange |
-| `1`, `yes`, `x`, `done`, `completed`, `réalisé` | completed: filled, green |
+| `Planned`, empty, `0`, `no`, `not started`, `futur` | planned: empty, red outline |
+| `Ongoing`, `en cours`, `in progress`, `started`, `partial` | ongoing: half filled, orange |
+| `Completed`, `1`, `yes`, `x`, `done`, `réalisé` | completed: filled, green |
 
 The fill level (empty, half, full) carries the state on its own, so the map can be
 read with colour blindness or in greyscale; the colours add a second cue.
@@ -68,15 +78,14 @@ read with colour blindness or in greyscale; the colours add a second cue.
 When bars would overlap, they push each other apart; a thin line links a moved
 bar to a dot at the site's true position. The layout is recalculated at every zoom.
 
-Rows without valid coordinates are skipped, an unknown status is shown as planned
-and an unknown I/J/K value as planned; all are reported in the browser console
-(View → Developer → JavaScript Console). Accepted words and colours are in
-`src/config.js` (`MEASUREMENT_STATES`, `SITE_STATUSES`).
+Rows without valid coordinates are left off the map (they still appear in the
+directory) and an unknown G/H/I value is shown as planned; both are reported in the
+browser console (View → Developer → JavaScript Console). Accepted words and colours
+are in `src/config.js` (`MEASUREMENT_STATES`); the column positions are in
+`DATA_COLUMNS`.
 
-**Map and directory.** A site whose name matches an entry of the `Sitesdirectory`
-tab (case, accents and punctuation ignored) gets "See in the site directory" on
-the map and "Show on map" in the directory. The console lists names found in one
-tab but not the other, to help keep them in sync.
+**Map and directory.** Each site on the map has "See in the site directory", and
+each directory entry has "Show on map".
 
 **Background maps.** "Outdoors" is [OpenFreeMap](https://openfreemap.org)'s
 Liberty style: free and open, with no account, no API key and no usage limits.
@@ -128,10 +137,10 @@ afterwards so they are not lost if someone deploys with `--clean`.
 
 All content comes from the Geotrees_Back-CARTO spreadsheet
 (https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng),
-tabs `Data`, `Aboutus`, `Sitesdirectory`, `Opportunities` and `News` (other tabs
-are ignored). The tab
-names and column order must stay as they are; if a tab is renamed, update
-`SHEET_TABS` in `src/config.js`. The spreadsheet must be shared as
+tabs `Data` (map and site directory), `Aboutus`, `Opportunities` and `News`;
+other tabs, including `Sitesdirectory`, are ignored. The tab names and column
+order must stay as they are; if a tab is renamed, update `SHEET_TABS` in
+`src/config.js`. The spreadsheet must be shared as
 **Anyone with the link: Viewer**, because visitors' browsers read it directly.
 
 To use another spreadsheet without changing the code, set in `.env.local` or the
@@ -139,7 +148,8 @@ build environment:
 
 ```
 VITE_SPREADSHEET_ID=<id>          # all tabs
-VITE_MAP_SPREADSHEET_ID=<id>      # only the map's Data tab, if it lives elsewhere
+VITE_MAP_SPREADSHEET_ID=<id>      # only the Data tab, if it lives elsewhere
+VITE_DATA_TAB=<tab name>          # read another tab instead of Data (e.g. a copy to test)
 ```
 
 The id is the part of the sheet's address between `/d/` and `/edit`.

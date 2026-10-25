@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.0.12 (2026-10-24)
+
+Goes with the merged `Data` tab (GEOTREES_Supersite_Data.xlsx): the
+`Sitesdirectory` columns were added to `Data`, and its status and year columns
+removed. Update the Google Sheet and deploy this version at the same time.
+
+### Changed
+- The site directory reads the `Data` tab instead of `Sitesdirectory`, so the map
+  and the directory always list the same sites. Both share one request.
+- New `Data` columns: A–E unchanged, F Site_URL, G–I ALS/TLS/Inventory, J–R the
+  former `Sitesdirectory` columns (see README). Positions are set in
+  `DATA_COLUMNS` in `src/config.js`.
+- A site without valid coordinates is left off the map but stays in the directory.
+
+### Added
+- `VITE_DATA_TAB` to read another tab instead of `Data` (to test a copy first).
+
+### Removed
+- The site status and year (former `Data` columns F and G) and everything that read
+  them; the check comparing the two tabs' site names.
+
 ## 2.0.11 (2026-10-24)
 
 ### Changed

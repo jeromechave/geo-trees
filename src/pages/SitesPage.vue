@@ -94,7 +94,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import SiteHeader from '@/components/SiteHeader.vue'
 import SheetError from '@/components/SheetError.vue'
 import SitesMap from '@/components/SitesMap.vue'
@@ -112,8 +112,8 @@ const toggleSiteDetails = (site) => {
   }
 }
 
-// ---- links between the map ("Data" tab) and the directory ("Sitesdirectory" tab),
-// matched by site name (case, accents and punctuation ignored)
+// ---- links between the map and the directory: both come from the Data tab and
+// are matched by site name (a site without valid coordinates is in the directory only)
 const sitesMap = ref(null)
 const mapSlugs = ref(new Set())
 const directorySites = computed(() => Object.values(sitesData.value || {}).flat())
@@ -135,15 +135,6 @@ function showOnMap(site) {
   sitesMap.value.$el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   sitesMap.value.focusSite(slugify(site.name))
 }
-
-// Helps editors keep the two tabs in sync (visible in the browser console)
-watch([mapSlugs, directorySlugs], ([onMap, inDirectory]) => {
-  if (onMap.size === 0 || inDirectory.size === 0) return
-  const notInDirectory = [...onMap].filter((slug) => !inDirectory.has(slug))
-  const notOnMap = [...inDirectory].filter((slug) => !onMap.has(slug))
-  if (notInDirectory.length) console.info('Sites on the map ("Data") with no directory entry:', notInDirectory)
-  if (notOnMap.length) console.info('Directory sites ("Sitesdirectory") not on the map:', notOnMap)
-})
 </script>
 
 <style lang="scss">
