@@ -60,17 +60,20 @@
           <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link"  target="_blank"><img :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
-        <h2>Community</h2>
-        <div class="community-member-list">
-          <div class="community-member" v-for="(member, position) in community" :class="member.group" :key="position">
-            <div class="community-member-image">
-              <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
+        <!-- Community: hidden for now, kept for a later release (see SHOW_COMMUNITY below) -->
+        <template v-if="SHOW_COMMUNITY">
+          <h2>Community</h2>
+          <div class="community-member-list">
+            <div class="community-member" v-for="(member, position) in community" :class="member.group" :key="position">
+              <div class="community-member-image">
+                <img :style="{'width': member.zoom+'%'}" :src="sheetImage(member.image)" alt=""/>
+              </div>
+              <h3>{{member.name}}</h3>
+              <span v-for="(r, position) in splitList(member.role)" :key="position" class="community-member-role">{{r}}</span>
+              <span v-for="(f, position) in splitList(member.affiliation)" :key="position" class="community-member-affiliation">{{f}}</span>
             </div>
-            <h3>{{member.name}}</h3>
-            <span v-for="(r, position) in splitList(member.role)" :key="position" class="community-member-role">{{r}}</span>
-            <span v-for="(f, position) in splitList(member.affiliation)" :key="position" class="community-member-affiliation">{{f}}</span>
           </div>
-        </div>
+        </template>
 
         <h2>Site Partners</h2>
         <a href="https://geo-trees.org/sites.html">More information about the sites</a>
@@ -116,6 +119,10 @@ const networksPartners = group('networks-partners')
 const sitePartners = group('site-partners')
 const supportingPartners = group('supporting-partners')
 const community = group('community')
+
+// The Community section is hidden for now and kept for a later release:
+// set to true to show it again (between Network Partners and Site Partners).
+const SHOW_COMMUNITY = false
 
 const splitList = splitItems // "a; b" -> ['a', 'b']
 </script>

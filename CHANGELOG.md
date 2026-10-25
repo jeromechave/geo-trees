@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.16 (2026-10-24)
+
+### Changed
+- About us: the Community section is hidden, between Network Partners and Site
+  Partners. Its code is kept for a later release: set `SHOW_COMMUNITY` to `true`
+  in `src/pages/AboutPage.vue` to show it again. The community rows stay in the
+  `Aboutus` tab.
+
 ## 2.0.15 (2026-10-24)
 
 ### Changed
