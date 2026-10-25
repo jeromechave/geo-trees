@@ -144,8 +144,8 @@ const emit = defineEmits(['sites-loaded', 'show-in-directory'])
 const LABEL_ZOOM = 5 // site names appear from this zoom level
 
 // Size of a site's bar in pixels (keep in sync with .site-bar in the styles)
-// 3 squares of 8 px + 1 px white border around and between them
-const BAR = { width: 28, height: 10 }
+// 3 squares of 6 px with 1 px between them (no frame)
+const BAR = { width: 20, height: 6 }
 // Site name above the bar: height, gap to the bar, and font used to measure it
 const LABEL = { height: 22, gap: 6, font: '12px Lato-Bold, sans-serif', padding: 18 }
 
@@ -489,6 +489,8 @@ $light: #F3F5E5;
   // only the bar is clickable, not the (possibly empty) spot where the site really is
   pointer-events: none !important;
   .site-bar { pointer-events: auto; cursor: pointer; }
+  // slightly larger clickable area than the small bar (stays within the 5 px between bars)
+  .site-bar::after { content: ""; position: absolute; inset: -2px; }
 
   &:focus-visible { outline: none; }
   &:focus-visible .site-bar { outline: 2px solid $navy; outline-offset: 2px; }
@@ -503,15 +505,14 @@ $light: #F3F5E5;
   inset: 0;
   display: flex;
   gap: 1px;
-  padding: 1px;
-  background: #fff;
-  border-radius: 1px;
-  box-shadow: 0 1px 3px rgba(33, 48, 67, 0.55);
-  box-sizing: border-box;
+  // shadow follows the squares' shapes, so they stand out on any background
+  filter: drop-shadow(0 0.5px 1.5px rgba(33, 48, 67, 0.6));
   transition: transform 0.15s ease-out;
 }
 .site-bar-square {
   flex: 1;
+  // thinner outline than elsewhere: the squares are only 6 px
+  &.fill-empty, &.fill-half { box-shadow: inset 0 0 0 1px var(--c); }
 }
 .site-marker:hover .site-bar,
 .site-marker:focus-visible .site-bar,
@@ -519,27 +520,28 @@ $light: #F3F5E5;
   transform: scale(1.2); // grows 2.5 px per side: less than the spacing kept by layoutMarkers()
 }
 .site-marker.selected .site-bar {
-  box-shadow: 0 0 0 1px #fff, 0 0 0 2.5px $navy;
+  outline: 1.5px solid $navy;
+  outline-offset: 1.5px;
 }
 // shown when the bar was moved away from the site's real position
 .site-marker-anchor {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
   border-radius: 50%;
   background: $navy;
-  box-shadow: 0 0 0 1.5px #fff;
+  box-shadow: 0 0 0 1px #fff;
   opacity: 0;
 }
 .site-marker-leader {
   position: absolute;
   left: 50%;
   top: 50%;
-  height: 1.5px;
-  margin-top: -0.75px;
+  height: 1px;
+  margin-top: -0.5px;
   background: $navy;
   transform-origin: 0 50%;
   opacity: 0;
@@ -557,7 +559,7 @@ $light: #F3F5E5;
 }
 .site-marker-label {
   position: absolute;
-  bottom: 16px; // bar height + gap (BAR.height + LABEL.gap in the script)
+  bottom: 12px; // bar height + gap (BAR.height + LABEL.gap in the script)
   left: 50%;
   transform: translateX(-50%);
   padding: 3px 9px;

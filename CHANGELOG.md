@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.7 (2026-10-24)
+
+### Changed
+- On the map, the "Not started" state is now called "Planned" (legend, site panel,
+  screen-reader text), matching the planned status filter.
+- Smaller bars without the white frame: 6 px squares with 1 px between them
+  (20 × 6 px). A soft shadow keeps them visible on light and satellite backgrounds.
+  The clickable area extends 2 px around each bar.
+- Smaller dots and thinner lines linking a moved bar to its true position.
+
 ## 2.0.6 (2026-10-24)
 
 ### Changed

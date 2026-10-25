@@ -151,7 +151,7 @@ export async function loadMapSites() {
           const value = cell(row, measurement.column)
           let state = MEASUREMENT_STATE_BY_ALIAS.get(normalizeWords(value))
           if (!state) {
-            console.warn(`Map: "${name}" (Datas row ${line}) has an unknown ${measurement.short} value "${value}"; shown as not started.`)
+            console.warn(`Map: "${name}" (Datas row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
             state = 'not-started'
           }
           return [measurement.id, state]

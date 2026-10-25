@@ -58,7 +58,7 @@ Each site is drawn as a bar of three squares, left to right: **ALS**, **TLS**,
 
 | Cell value (case and accents ignored) | Square |
 | --- | --- |
-| empty, `0`, `no`, `not started`, `futur` | not started: empty, red outline |
+| empty, `0`, `no`, `not started`, `futur` | planned: empty, red outline |
 | `en cours`, `ongoing`, `in progress`, `started`, `partial` | ongoing: half filled, orange |
 | `1`, `yes`, `x`, `done`, `completed`, `réalisé` | completed: filled, green |
 
@@ -70,7 +70,7 @@ When bars would overlap, they push each other apart; a thin line links a moved
 bar to a dot at the site's true position. The layout is recalculated at every zoom.
 
 Rows without valid coordinates are skipped, an unknown status is shown as planned
-and an unknown I/J/K value as not started; all are reported in the browser console
+and an unknown I/J/K value as planned; all are reported in the browser console
 (View → Developer → JavaScript Console). Accepted words and colours are in
 `src/config.js` (`MEASUREMENT_STATES`, `SITE_STATUSES`).
 

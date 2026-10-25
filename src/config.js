@@ -73,7 +73,7 @@ const GREEN = '#53A034'
 export const MEASUREMENT_STATES = [
   {
     id: 'not-started',
-    label: 'Not started',
+    label: 'Planned',
     color: RED,
     fill: 'empty',
     aliases: ['', '0', 'no', 'non', 'n', 'false', 'not started', 'todo', 'to do', 'futur', 'future', 'planned', 'prévu']
