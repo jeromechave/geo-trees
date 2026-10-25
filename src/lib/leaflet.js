@@ -1,7 +1,6 @@
 // Loads Leaflet and its plugins on demand, so only the Sites page downloads them.
-// The two Leaflet plugins are UMD builds that expect Leaflet as a global "L".
+// The gesture-handling plugin is a UMD build that expects Leaflet as a global "L".
 import 'leaflet/dist/leaflet.css'
-import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet-gesture-handling/dist/leaflet-gesture-handling.css'
 
 let loadingLeaflet
@@ -11,7 +10,6 @@ export function loadLeaflet() {
   loadingLeaflet ||= (async () => {
     const { default: L } = await import('leaflet')
     window.L = L
-    await import('leaflet.markercluster')
     await import('leaflet-gesture-handling') // registers the "gestureHandling" map option
     return L
   })()

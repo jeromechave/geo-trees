@@ -35,10 +35,27 @@
           :aria-pressed="visibleStatuses[status.id] ? 'true' : 'false'"
           @click="toggleStatus(status.id)"
         >
-          <span class="diamond" :style="{ color: status.color }" aria-hidden="true"></span>
+          <span class="swatch" :style="{ color: status.color }" aria-hidden="true"></span>
           {{ status.label }}
           <span class="count">{{ counts[status.id] }}</span>
         </button>
+      </div>
+
+      <div class="sites-map-legend">
+        <div class="legend-bar" aria-hidden="true">
+          <span v-for="measurement in MEASUREMENTS" :key="measurement.id" class="legend-square">
+            <span class="square"></span>
+            <span class="legend-caption">{{ measurement.short }}</span>
+          </span>
+        </div>
+        <p class="visually-hidden">
+          Each site is a bar of three squares: {{ MEASUREMENTS.map((measurement) => measurement.label).join(', ') }}.
+        </p>
+        <ul class="legend-states">
+          <li v-for="state in MEASUREMENT_STATES" :key="state.id">
+            <span class="swatch" :style="{ color: state.color }" aria-hidden="true"></span>{{ state.label }}
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -71,7 +88,7 @@
       :aria-label="selected.name"
     >
       <div class="panel-status">
-        <span class="diamond" :style="{ color: statusOf(selected).color }" aria-hidden="true"></span>
+        <span class="swatch" :style="{ color: statusOf(selected).color }" aria-hidden="true"></span>
         <span class="status-text">{{ statusOf(selected).label }}</span>
         <span v-if="selected.date" class="status-date">{{ selected.date }}</span>
         <button type="button" class="panel-close" aria-label="Close" @click="closePanel">×</button>
@@ -81,13 +98,15 @@
         <h3 class="panel-name">{{ selected.name }}</h3>
         <p class="panel-coordinates">{{ selected.lat }}, {{ selected.lon }}</p>
         <p v-if="selected.description" class="panel-description">{{ selected.description }}</p>
-        <template v-if="measurementsDone.length">
-          <hr>
-          <p class="panel-measurements-title">Completed measurements:</p>
-          <ul class="panel-measurements">
-            <li v-for="measurement in measurementsDone" :key="measurement">{{ measurement }}</li>
-          </ul>
-        </template>
+        <hr>
+        <p class="panel-measurements-title">Measurements:</p>
+        <ul class="panel-measurements">
+          <li v-for="measurement in MEASUREMENTS" :key="measurement.id">
+            <span class="swatch" :style="{ color: stateOf(selected, measurement).color }" aria-hidden="true"></span>
+            <span class="measurement-name">{{ measurement.label }} ({{ measurement.short }})</span>
+            <span class="measurement-state">{{ stateOf(selected, measurement).label }}</span>
+          </li>
+        </ul>
       </div>
       <div v-if="selected.url || hasDirectoryEntry(selected)" class="panel-links">
         <a v-if="selected.url" :href="selected.url" target="_blank" rel="noopener">Visit the site’s website</a>
@@ -106,9 +125,10 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
-import { MAP_FALLBACK_LAYER, MAP_LAYERS, SITE_STATUSES } from '@/config'
+import { MAP_FALLBACK_LAYER, MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS, SITE_STATUSES } from '@/config'
 import { loadMapSites, slugify } from '@/lib/sheets'
 import { loadLeaflet, loadVectorSupport, supportsWebGL } from '@/lib/leaflet'
+import { repel } from '@/lib/repel'
 
 const props = defineProps({
   // slugs of the sites listed in the site directory, to link the two
@@ -117,6 +137,11 @@ const props = defineProps({
 const emit = defineEmits(['sites-loaded', 'show-in-directory'])
 
 const LABEL_ZOOM = 5 // site names appear from this zoom level
+
+// Size of a site's bar in pixels (keep in sync with .site-bar in the styles)
+const BAR = { width: 38, height: 14 }
+// Site name above the bar: height, gap to the bar, and font used to measure it
+const LABEL = { height: 22, gap: 6, font: '12px Lato-Bold, sans-serif', padding: 18 }
 
 const mapElement = ref(null)
 const panel = ref(null)
@@ -131,11 +156,12 @@ const zoom = ref(0)
 const visibleStatuses = reactive(Object.fromEntries(SITE_STATUSES.map((status) => [status.id, true])))
 
 let L
-let clusterGroup
+let markerLayer
 let tileLayers = {}
 const markers = new Map() // site.id -> Leaflet marker
 
 const statusOf = (site) => SITE_STATUSES.find((status) => status.id === site.status)
+const stateOf = (site, measurement) => MEASUREMENT_STATES.find((state) => state.id === site.measurements[measurement.id])
 const showLabels = computed(() => zoom.value >= LABEL_ZOOM)
 const hasDirectoryEntry = (site) => props.directorySlugs.has(site.slug)
 
@@ -154,12 +180,6 @@ const searchResults = computed(() => {
     .slice(0, 8)
 })
 
-const measurementsDone = computed(() => {
-  if (!selected.value) return []
-  const { inventory, als, tls } = selected.value.measurements
-  return [inventory && 'Forest plot inventory', als && 'ALS (airborne laser scanning)', tls && 'TLS (terrestrial laser scanning)'].filter(Boolean)
-})
-
 // First click on a status when all are shown keeps only that one;
 // after that, clicks toggle (at least one status always stays visible).
 function toggleStatus(id) {
@@ -175,29 +195,78 @@ function toggleStatus(id) {
   }
 }
 
+// A site is drawn with two markers: in a layer below all bars, a dot at its true
+// position and a leader line to its bar (shown only when the bar had to move to
+// avoid another one); above, the bar itself with the name above it.
+const leaderHtml = '<span class="site-marker-leader"></span><span class="site-marker-anchor"></span>'
+
 function markerHtml(site) {
   const label = document.createElement('span')
   label.className = 'site-marker-label'
   label.textContent = site.name // textContent: names from the sheet are never parsed as HTML
-  return `<span class="site-marker-diamond" style="color:${statusOf(site).color}"></span>${label.outerHTML}`
+  const squares = MEASUREMENTS.map((measurement) =>
+    `<span class="site-bar-square" style="background:${stateOf(site, measurement).color}"></span>`).join('')
+  return `<span class="site-marker-body">${label.outerHTML}<span class="site-bar">${squares}</span></span>`
+}
+
+const markerDescription = (site) =>
+  `${site.name}: ` + MEASUREMENTS.map((measurement) => `${measurement.short} ${stateOf(site, measurement).label.toLowerCase()}`).join(', ')
+
+// Width of each site name in pixels, measured once
+const labelWidths = new Map()
+function labelWidth(site) {
+  if (!labelWidths.has(site.id)) {
+    const context = document.createElement('canvas').getContext('2d')
+    context.font = LABEL.font
+    labelWidths.set(site.id, Math.ceil(context.measureText(site.name).width * 1.08) + LABEL.padding)
+  }
+  return labelWidths.get(site.id)
+}
+
+// Moves bars apart so that none overlap at the current zoom level (see lib/repel.js).
+// Runs after every zoom; panning does not change the layout.
+function layoutMarkers() {
+  if (!map.value || markers.size === 0) return
+  const entries = [...markers.values()]
+  const withLabels = showLabels.value
+  const items = entries.map(({ site, marker }) => {
+    const point = map.value.latLngToLayerPoint(marker.getLatLng())
+    if (!withLabels) return { x: point.x, y: point.y, width: BAR.width, height: BAR.height }
+    // the box covers the bar and the name above it
+    const height = BAR.height + LABEL.gap + LABEL.height
+    return { x: point.x, y: point.y - (height - BAR.height) / 2, width: Math.max(BAR.width, labelWidth(site)), height }
+  })
+  const offsets = repel(items)
+  entries.forEach(({ marker, leaderMarker }, i) => {
+    const element = marker.getElement()
+    const leaderElement = leaderMarker.getElement()
+    if (!element || !leaderElement) return
+    const { dx, dy } = offsets[i]
+    const distance = Math.hypot(dx, dy)
+    element.querySelector('.site-marker-body').style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`
+    leaderElement.classList.toggle('displaced', distance > 2)
+    const leader = leaderElement.querySelector('.site-marker-leader')
+    leader.style.width = `${distance.toFixed(1)}px`
+    leader.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`
+  })
 }
 
 function renderMarkers() {
-  if (!clusterGroup) return
-  clusterGroup.clearLayers()
+  if (!markerLayer) return
+  markerLayer.clearLayers()
   markers.clear()
   sites.value
     .filter((site) => visibleStatuses[site.status])
     .forEach((site) => {
       const marker = L.marker([site.lat, site.lon], {
-        icon: L.divIcon({ className: 'site-marker', html: markerHtml(site), iconSize: [18, 18] }),
+        icon: L.divIcon({ className: 'site-marker', html: markerHtml(site), iconSize: [BAR.width, BAR.height] }),
         riseOnHover: true
       })
       marker.on('click', () => selectSite(site))
       marker.on('add', () => {
         const element = marker.getElement()
         element.setAttribute('role', 'button')
-        element.setAttribute('aria-label', `${site.name}, ${statusOf(site).label}`)
+        element.setAttribute('aria-label', markerDescription(site))
         // Leaflet makes markers focusable but does not open them with the keyboard
         element.onkeydown = (event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -207,13 +276,21 @@ function renderMarkers() {
         }
         element.classList.toggle('selected', selected.value === site)
       })
-      markers.set(site.id, marker)
-      clusterGroup.addLayer(marker)
+      const leaderMarker = L.marker([site.lat, site.lon], {
+        pane: 'siteLeaders',
+        interactive: false,
+        keyboard: false,
+        icon: L.divIcon({ className: 'site-leader', html: leaderHtml, iconSize: [BAR.width, BAR.height] })
+      })
+      markers.set(site.id, { site, marker, leaderMarker })
+      markerLayer.addLayer(leaderMarker)
+      markerLayer.addLayer(marker)
     })
+  layoutMarkers()
 }
 
 function fitAll() {
-  const visible = [...markers.values()]
+  const visible = [...markers.values()].map((entry) => entry.marker)
   if (!map.value || visible.length === 0) return
   map.value.fitBounds(L.featureGroup(visible).getBounds(), { padding: [40, 40], maxZoom: 8 })
 }
@@ -229,8 +306,8 @@ function selectSite(site, { fly = false } = {}) {
   selected.value = selected.value === site && !fly ? null : site
   if (selected.value && fly) {
     nextTick(() => {
-      const marker = markers.get(site.id)
-      if (marker) clusterGroup.zoomToShowLayer(marker, () => flyToSite(marker.getLatLng()))
+      const entry = markers.get(site.id)
+      if (entry) flyToSite(entry.marker.getLatLng())
     })
   }
   if (selected.value) nextTick(() => panel.value && panel.value.focus({ preventScroll: true }))
@@ -259,7 +336,7 @@ function focusSite(slug) {
 defineExpose({ focusSite })
 
 watch(selected, (site) => {
-  markers.forEach((marker, id) => {
+  markers.forEach(({ marker }, id) => {
     const element = marker.getElement()
     if (element) element.classList.toggle('selected', Boolean(site) && site.id === id)
   })
@@ -325,21 +402,21 @@ onMounted(async () => {
     }).setView([5, 0], 2)
     showBackground(activeLayer.value)
     map.value.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>')
-    map.value.on('zoomend', () => { zoom.value = map.value.getZoom() })
+    map.value.on('zoomend', () => {
+      zoom.value = map.value.getZoom()
+      layoutMarkers()
+    })
     map.value.on('click', closePanel)
 
-    // Groups only sites at exactly the same place; they fan out on click
-    clusterGroup = L.markerClusterGroup({
-      maxClusterRadius: 0,
-      showCoverageOnHover: false,
-      spiderfyOnMaxZoom: true,
-      iconCreateFunction: (cluster) =>
-        L.divIcon({ className: 'site-cluster', html: `<span>${cluster.getChildCount()}</span>`, iconSize: [28, 28] })
-    }).addTo(map.value)
+    // leader lines and true-position dots go below every bar
+    map.value.createPane('siteLeaders').style.zIndex = 590
+    markerLayer = L.layerGroup().addTo(map.value)
 
+    zoom.value = map.value.getZoom()
     renderMarkers()
     fitAll()
-    zoom.value = map.value.getZoom()
+    // the site names use a web font: lay out again once it is loaded
+    document.fonts && document.fonts.ready.then(() => { labelWidths.clear(); layoutMarkers() })
   } catch (e) {
     console.error(e)
     error.value = e
@@ -394,34 +471,85 @@ $light: #F3F5E5;
 }
 
 // ---------- markers ----------
+// The marker element itself sits on the site's true position (BAR size, centred);
+// .site-marker-body is moved by layoutMarkers() when bars would overlap.
 .site-marker {
   background: none;
   border: 0;
+  overflow: visible;
+  // only the bar is clickable, not the (possibly empty) spot where the site really is
+  pointer-events: none !important;
+  .site-bar { pointer-events: auto; cursor: pointer; }
 
   &:focus-visible { outline: none; }
-  &:focus-visible .site-marker-diamond { outline: 2px solid $navy; outline-offset: 3px; }
+  &:focus-visible .site-bar { outline: 2px solid $navy; outline-offset: 2px; }
 }
-.site-marker-diamond {
+.site-marker-body {
   position: absolute;
-  inset: 1px;
-  background: currentColor;
-  border: 1.5px solid #fff;
+  inset: 0;
+  transition: transform 0.25s ease-out;
+}
+.site-bar {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: #fff;
   border-radius: 2px;
-  transform: rotate(45deg) scale(0.85);
-  box-shadow: 0 1px 4px rgba(33, 48, 67, 0.45);
-  transition: transform 0.2s ease-out;
+  box-shadow: 0 1px 4px rgba(33, 48, 67, 0.5);
+  box-sizing: border-box;
+  transition: transform 0.15s ease-out;
 }
-.site-marker:hover .site-marker-diamond,
-.site-marker:focus-visible .site-marker-diamond,
-.site-marker.selected .site-marker-diamond {
-  transform: rotate(45deg) scale(1.15);
+.site-bar-square {
+  flex: 1;
+  border-radius: 1px;
 }
-.site-marker.selected .site-marker-diamond {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 0 5px $navy;
+.site-marker:hover .site-bar,
+.site-marker:focus-visible .site-bar,
+.site-marker.selected .site-bar {
+  transform: scale(1.18);
+}
+.site-marker.selected .site-bar {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px $navy;
+}
+// shown when the bar was moved away from the site's real position
+.site-marker-anchor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: $navy;
+  box-shadow: 0 0 0 1.5px #fff;
+  opacity: 0;
+}
+.site-marker-leader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 1.5px;
+  margin-top: -0.75px;
+  background: $navy;
+  transform-origin: 0 50%;
+  opacity: 0;
+  transition: width 0.25s ease-out, transform 0.25s ease-out;
+}
+.site-leader {
+  background: none;
+  border: 0;
+  overflow: visible;
+  pointer-events: none;
+  &.displaced {
+    .site-marker-anchor,
+    .site-marker-leader { opacity: 0.85; }
+  }
 }
 .site-marker-label {
   position: absolute;
-  bottom: 26px;
+  bottom: 20px; // bar height + gap (LABEL.gap in the script)
   left: 50%;
   transform: translateX(-50%);
   padding: 3px 9px;
@@ -442,22 +570,6 @@ $light: #F3F5E5;
 .site-marker:focus-visible .site-marker-label,
 .site-marker.selected .site-marker-label {
   opacity: 1;
-}
-.site-cluster {
-  background: none;
-  span {
-    display: block;
-    min-width: 28px;
-    padding: 4px 6px;
-    background: #fff;
-    border: 2px solid $navy;
-    border-radius: 3px;
-    font-family: "Lato-Bold", sans-serif;
-    font-size: 14px;
-    line-height: 16px;
-    text-align: center;
-    color: $navy;
-  }
 }
 
 // ---------- overlays ----------
@@ -535,17 +647,61 @@ $light: #F3F5E5;
   &.off {
     background: rgba(255, 255, 255, 0.7);
     color: rgba(33, 48, 67, 0.55);
-    .diamond { opacity: 0.35; }
+    .swatch { opacity: 0.35; }
   }
 }
-.diamond {
+.swatch {
   display: inline-block;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   background: currentColor;
-  transform: rotate(45deg);
   border-radius: 1px;
   flex: none;
+}
+
+.sites-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  align-self: flex-start;
+  padding: 7px 12px 6px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(33, 48, 67, 0.2);
+  font-size: 12px;
+
+  .legend-bar {
+    display: flex;
+    gap: 3px;
+  }
+  .legend-square {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    .square {
+      width: 14px;
+      height: 14px;
+      border-radius: 1px;
+      background: #9aa3ad;
+      box-shadow: 0 0 0 1px #fff, 0 0 0 2px #c6ccd2;
+    }
+  }
+  .legend-caption {
+    font-family: "Lato-Bold", sans-serif;
+    font-size: 10px;
+    line-height: 12px;
+  }
+  .legend-states {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0 0 0 14px;
+    list-style: none;
+    border-left: 1px solid #d1dcc4;
+    li { display: flex; align-items: center; gap: 6px; line-height: 14px; }
+  }
 }
 
 .sites-map-layers {
@@ -620,7 +776,7 @@ $light: #F3F5E5;
   background: $navy;
   color: #fff;
 
-  .diamond { width: 11px; height: 11px; box-shadow: 0 0 0 1.5px #fff; }
+  .swatch { width: 11px; height: 11px; box-shadow: 0 0 0 1.5px #fff; }
   .status-text { font-family: "Lato-Bold", sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
   .status-date { opacity: 0.8; font-size: 14px; }
   .panel-close {
@@ -657,25 +813,15 @@ $light: #F3F5E5;
     padding: 0;
     list-style: none;
     li {
-      position: relative;
-      padding-left: 26px;
-      margin-bottom: 6px;
-      font-family: "Lato-Bold", sans-serif;
-      &::before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        top: -1px;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: $green;
-        color: #fff;
-        font-size: 11px;
-        line-height: 18px;
-        text-align: center;
-      }
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 14px;
     }
+    .swatch { width: 12px; height: 12px; }
+    .measurement-name { flex: 1; }
+    .measurement-state { font-family: "Lato-Bold", sans-serif; }
   }
 }
 .panel-links {

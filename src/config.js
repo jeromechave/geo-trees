@@ -56,11 +56,46 @@ export const MAP_FALLBACK_LAYER = {
   maxZoom: 19
 }
 
-// Site statuses. "aliases" are the values accepted in the "Datas" tab of the sheet
-// (case, accents and extra spaces are ignored). Colours are used for both the
-// diamonds and the filter legend.
+// Colours shared by the measurement squares and the status filters
+const RED = '#D7372B'
+const ORANGE = '#F28E1C'
+const GREEN = '#53A034'
+
+// State of each measurement (columns I, J, K of the "Datas" tab). "aliases" are the
+// values accepted in those cells; case, accents and extra spaces are ignored.
+export const MEASUREMENT_STATES = [
+  {
+    id: 'not-started',
+    label: 'Not started',
+    color: RED,
+    aliases: ['', '0', 'no', 'non', 'n', 'false', 'not started', 'todo', 'to do', 'futur', 'future', 'planned', 'prévu']
+  },
+  {
+    id: 'ongoing',
+    label: 'Ongoing',
+    color: ORANGE,
+    aliases: ['en cours', 'ongoing', 'in progress', 'started', 'partial', 'current']
+  },
+  {
+    id: 'completed',
+    label: 'Completed',
+    color: GREEN,
+    aliases: ['1', 'yes', 'y', 'x', 'oui', 'true', 'done', 'completed', 'complete', 'réalisé', 'terminé', 'fait']
+  }
+]
+
+// The three squares of each site's bar, left to right, and their sheet column
+// (0 = column A, so 8 = column I)
+export const MEASUREMENTS = [
+  { id: 'als', short: 'ALS', label: 'Airborne laser scanning', column: 8 },
+  { id: 'tls', short: 'TLS', label: 'Terrestrial laser scanning', column: 9 },
+  { id: 'plot', short: 'Plot', label: 'Forest plot inventory', column: 10 }
+]
+
+// Site statuses (column F of the "Datas" tab), used by the filters. "aliases" are
+// the values accepted in the sheet (case, accents and extra spaces are ignored).
 export const SITE_STATUSES = [
-  { id: 'completed', label: 'Completed', color: '#53A034', aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },
-  { id: 'ongoing', label: 'Ongoing', color: '#FDAB0A', aliases: ['en cours', 'ongoing', 'in progress', 'current'] },
-  { id: 'planned', label: 'Planned', color: '#4C4C4C', aliases: ['futur', 'future', 'planned', 'prévu', 'prevu'] }
+  { id: 'completed', label: 'Completed', color: GREEN, aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },
+  { id: 'ongoing', label: 'Ongoing', color: ORANGE, aliases: ['en cours', 'ongoing', 'in progress', 'current'] },
+  { id: 'planned', label: 'Planned', color: RED, aliases: ['futur', 'future', 'planned', 'prévu', 'prevu'] }
 ]

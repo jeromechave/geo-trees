@@ -1,4 +1,4 @@
-import { SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
+import { MEASUREMENT_STATES, MEASUREMENTS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -107,8 +107,9 @@ const STATUS_BY_ALIAS = new Map(
   SITE_STATUSES.flatMap((status) => status.aliases.map((alias) => [normalizeWords(alias), status.id]))
 )
 
-// Accepts "1", "yes", "x", "true", "oui" (any case)
-const isChecked = (value) => ['1', 'yes', 'y', 'x', 'true', 'oui'].includes(value.toLowerCase())
+const MEASUREMENT_STATE_BY_ALIAS = new Map(
+  MEASUREMENT_STATES.flatMap((state) => state.aliases.map((alias) => [normalizeWords(alias), state.id]))
+)
 
 // Accepts "-0.2" and "-0,2"
 const coordinate = (value) => parseFloat(value.replace(',', '.'))
@@ -144,11 +145,18 @@ export async function loadMapSites() {
       status,
       date: cell(row, 6),
       url: cell(row, 7),
-      measurements: {
-        inventory: isChecked(cell(row, 10)),
-        als: isChecked(cell(row, 8)),
-        tls: isChecked(cell(row, 9))
-      }
+      // { als: 'completed', tls: 'ongoing', plot: 'not-started' }
+      measurements: Object.fromEntries(
+        MEASUREMENTS.map((measurement) => {
+          const value = cell(row, measurement.column)
+          let state = MEASUREMENT_STATE_BY_ALIAS.get(normalizeWords(value))
+          if (!state) {
+            console.warn(`Map: "${name}" (Datas row ${line}) has an unknown ${measurement.short} value "${value}"; shown as not started.`)
+            state = 'not-started'
+          }
+          return [measurement.id, state]
+        })
+      )
     })
   })
   return sites

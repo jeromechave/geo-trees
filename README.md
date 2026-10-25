@@ -51,11 +51,24 @@ It replaces the separate map previously embedded from `geo-trees.org/carto/`.
 | F | Status: `réalisé` / `completed`, `en cours` / `ongoing`, `futur` / `planned` (case and accents ignored) |
 | G | Date shown next to the status |
 | H | Website URL |
-| I, J, K | ALS, TLS, forest plot inventory done: `1`, `yes` or `x` |
+| I, J, K | State of ALS, TLS and the forest plot inventory (see below) |
 
-Rows without valid coordinates are skipped and an unknown status is shown as
-planned; both are reported in the browser console (View → Developer → JavaScript
-Console). Accepted status words and the diamond colours are in `src/config.js`.
+Each site is drawn as a bar of three squares, left to right: **ALS**, **TLS**,
+**Plot** (forest plot inventory). Each square takes its colour from columns I, J, K:
+
+| Cell value (case and accents ignored) | Square |
+| --- | --- |
+| empty, `0`, `no`, `not started`, `futur` | red: not started |
+| `en cours`, `ongoing`, `in progress`, `started`, `partial` | orange: ongoing |
+| `1`, `yes`, `x`, `done`, `completed`, `réalisé` | green: completed |
+
+When bars would overlap, they push each other apart; a thin line links a moved
+bar to a dot at the site's true position. The layout is recalculated at every zoom.
+
+Rows without valid coordinates are skipped, an unknown status is shown as planned
+and an unknown I/J/K value as not started; all are reported in the browser console
+(View → Developer → JavaScript Console). Accepted words and colours are in
+`src/config.js` (`MEASUREMENT_STATES`, `SITE_STATUSES`).
 
 **Map and directory.** A site whose name matches an entry of the `Sitesdirectory`
 tab (case, accents and punctuation ignored) gets "See in the site directory" on

@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.0.4 (2026-10-24)
+
+### Changed
+- Each site is drawn as a horizontal bar of three squares, left to right ALS, TLS
+  and Plot (forest plot inventory), instead of a diamond. Each square is red (not
+  started), orange (ongoing) or green (completed).
+- Columns I, J, K of the `Datas` tab now accept three states. Existing values keep
+  their meaning (`1` = completed, empty = not started); type `en cours` or
+  `ongoing` for a measurement under way.
+- Status filters use the same colours: planned red, ongoing orange, completed green.
+- The site panel lists the state of all three measurements.
+
+### Added
+- Non-overlapping layout: bars push each other apart instead of overlapping (names
+  included when they are shown), recalculated at every zoom. A line links a moved
+  bar to a dot at the site's true position.
+- A legend explaining the bar and its colours.
+
+### Removed
+- Grouping of sites at identical coordinates (leaflet.markercluster): such sites
+  are now simply placed next to each other.
+
 ## 2.0.3 (2026-10-24)
 
 ### Changed
