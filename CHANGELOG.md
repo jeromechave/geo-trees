@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.10 (2026-10-24)
+
+### Changed
+- Simpler site panel on the map: the site name is in the dark header (instead of
+  the status and date), followed by country and coordinates, the description, and
+  the links to the site's website and to the site directory. The list of
+  ALS/TLS/Plot states is removed, since the bar on the map already shows them
+  (screen readers still hear them on each bar).
+
 ## 2.0.9 (2026-10-24)
 
 ### Fixed

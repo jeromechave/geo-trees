@@ -87,31 +87,14 @@
       tabindex="-1"
       :aria-label="selected.name"
     >
-      <div class="panel-status">
-        <span class="swatch" :class="'fill-' + statusOf(selected).fill" :style="{ '--c': statusOf(selected).color }" aria-hidden="true"></span>
-        <span class="status-text">{{ statusOf(selected).label }}</span>
-        <span v-if="selected.date" class="status-date">{{ selected.date }}</span>
+      <div class="panel-header">
+        <h3 class="panel-name">{{ selected.name }}</h3>
         <button type="button" class="panel-close" aria-label="Close" @click="closePanel">×</button>
       </div>
       <div class="panel-content">
         <p v-if="selected.country" class="panel-country">{{ selected.country }}</p>
-        <h3 class="panel-name">{{ selected.name }}</h3>
         <p class="panel-coordinates">{{ selected.lat }}, {{ selected.lon }}</p>
         <p v-if="selected.description" class="panel-description">{{ selected.description }}</p>
-        <hr>
-        <p class="panel-measurements-title">Measurements:</p>
-        <ul class="panel-measurements">
-          <li v-for="measurement in MEASUREMENTS" :key="measurement.id">
-            <span
-              class="swatch"
-              :class="'fill-' + stateOf(selected, measurement).fill"
-              :style="{ '--c': stateOf(selected, measurement).color }"
-              aria-hidden="true"
-            ></span>
-            <span class="measurement-name">{{ measurement.label }} ({{ measurement.short }})</span>
-            <span class="measurement-state">{{ stateOf(selected, measurement).label }}</span>
-          </li>
-        </ul>
       </div>
       <div v-if="selected.url || hasDirectoryEntry(selected)" class="panel-links">
         <a v-if="selected.url" :href="selected.url" target="_blank" rel="noopener">Visit the site’s website</a>
@@ -166,7 +149,6 @@ let markerLayer
 let tileLayers = {}
 const markers = new Map() // site.id -> Leaflet marker
 
-const statusOf = (site) => SITE_STATUSES.find((status) => status.id === site.status)
 const stateOf = (site, measurement) => MEASUREMENT_STATES.find((state) => state.id === site.measurements[measurement.id])
 const showLabels = computed(() => zoom.value >= LABEL_ZOOM)
 const hasDirectoryEntry = (site) => props.directorySlugs.has(site.slug)
@@ -789,19 +771,27 @@ $light: #F3F5E5;
 
   &:focus { outline: none; }
 }
-.panel-status {
+.panel-header {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px 12px 20px;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px 14px 20px;
   background: $navy;
   color: #fff;
 
-  .swatch { width: 11px; height: 11px; outline: 1.5px solid #fff; }
-  .status-text { font-family: "Lato-Bold", sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
-  .status-date { opacity: 0.8; font-size: 14px; }
+  .panel-name {
+    flex: 1;
+    margin: 0;
+    padding-top: 2px;
+    font-family: "Lato-Bold", sans-serif;
+    font-size: 19px;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere; // long names wrap instead of widening the panel
+  }
   .panel-close {
-    margin-left: auto;
+    flex: none;
     width: 30px;
     height: 30px;
     border: 0;
@@ -814,36 +804,12 @@ $light: #F3F5E5;
 .panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 14px 20px 16px;
 
   p { margin: 0; }
   .panel-country { font-style: italic; }
-  .panel-name {
-    margin: 2px 0;
-    font-family: "Lato-Bold", sans-serif;
-    font-size: 21px;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
-  .panel-coordinates { font-size: 12px; letter-spacing: 0.05em; opacity: 0.75; }
+  .panel-coordinates { margin-top: 2px; font-size: 12px; letter-spacing: 0.05em; opacity: 0.75; }
   .panel-description { margin-top: 12px; font-size: 14px; line-height: 1.6; }
-  hr { margin: 16px 0; border: 0; border-top: 1px solid #d1dcc4; }
-  .panel-measurements-title { font-style: italic; margin-bottom: 8px; }
-  .panel-measurements {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 7px;
-      font-size: 14px;
-    }
-    .swatch { width: 12px; height: 12px; }
-    .measurement-name { flex: 1; }
-    .measurement-state { font-family: "Lato-Bold", sans-serif; }
-  }
 }
 .panel-links {
   display: flex;
