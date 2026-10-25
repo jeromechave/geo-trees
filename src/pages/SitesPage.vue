@@ -112,7 +112,7 @@ const toggleSiteDetails = (site) => {
   }
 }
 
-// ---- links between the map ("Datas" tab) and the directory ("Sitesdirectory" tab),
+// ---- links between the map ("Data" tab) and the directory ("Sitesdirectory" tab),
 // matched by site name (case, accents and punctuation ignored)
 const sitesMap = ref(null)
 const mapSlugs = ref(new Set())
@@ -141,7 +141,7 @@ watch([mapSlugs, directorySlugs], ([onMap, inDirectory]) => {
   if (onMap.size === 0 || inDirectory.size === 0) return
   const notInDirectory = [...onMap].filter((slug) => !inDirectory.has(slug))
   const notOnMap = [...inDirectory].filter((slug) => !onMap.has(slug))
-  if (notInDirectory.length) console.info('Sites on the map ("Datas") with no directory entry:', notInDirectory)
+  if (notInDirectory.length) console.info('Sites on the map ("Data") with no directory entry:', notInDirectory)
   if (notOnMap.length) console.info('Directory sites ("Sitesdirectory") not on the map:', notOnMap)
 })
 </script>

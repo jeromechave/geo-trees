@@ -1,4 +1,4 @@
-import { MAP_SPREADSHEET_ID, MEASUREMENT_STATES, MEASUREMENTS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
+import { MAP_SPREADSHEET_ID, MEASUREMENT_STATES, MEASUREMENTS, SHEET_TABS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -34,7 +34,7 @@ async function fetchRange(range, spreadsheetId = SPREADSHEET_ID) {
 }
 
 export async function loadAbout() {
-  const rows = await fetchRange('Aboutus!A2:K10000')
+  const rows = await fetchRange(`${SHEET_TABS.about}!A2:K10000`)
   return rows.map((row) => ({
     display: cell(row, 0),
     name: cell(row, 1),
@@ -48,7 +48,7 @@ export async function loadAbout() {
 }
 
 export async function loadNews() {
-  const rows = await fetchRange('News!A2:K10000')
+  const rows = await fetchRange(`${SHEET_TABS.news}!A2:K10000`)
   return rows.map((row) => ({
     date: cell(row, 0),
     title: cell(row, 1),
@@ -60,7 +60,7 @@ export async function loadNews() {
 }
 
 export async function loadOpportunities() {
-  const rows = await fetchRange('Opportunities!A2:K10000')
+  const rows = await fetchRange(`${SHEET_TABS.opportunities}!A2:K10000`)
   const items = rows.map((row) => ({
     categorie: cell(row, 0),
     date: cell(row, 1),
@@ -73,7 +73,7 @@ export async function loadOpportunities() {
 }
 
 export async function loadSites() {
-  const rows = await fetchRange('Sitesdirectory!A2:N10000')
+  const rows = await fetchRange(`${SHEET_TABS.directory}!A2:N10000`)
   const items = rows.map((row) => ({
     country: cell(row, 0),
     name: cell(row, 1),
@@ -94,7 +94,7 @@ export async function loadSites() {
 }
 
 // "Lopé National Park" -> "lope-national-park". Used to match the same site
-// between the "Datas" (map) and "Sitesdirectory" (directory) tabs.
+// between the "Data" (map) and "Sitesdirectory" (directory) tabs.
 export const slugify = (value) =>
   String(value || '')
     .normalize('NFD')
@@ -116,9 +116,9 @@ const MEASUREMENT_STATE_BY_ALIAS = new Map(
 // Accepts "-0.2" and "-0,2"
 const coordinate = (value) => parseFloat(value.replace(',', '.'))
 
-// "Datas" tab: one row per site shown on the map
+// "Data" tab: one row per site shown on the map
 export async function loadMapSites() {
-  const rows = await fetchRange('Datas!A2:K10000', MAP_SPREADSHEET_ID)
+  const rows = await fetchRange(`${SHEET_TABS.map}!A2:K10000`, MAP_SPREADSHEET_ID)
   const sites = []
   rows.forEach((row, index) => {
     const line = index + 2 // spreadsheet row number, for messages
@@ -127,13 +127,13 @@ export async function loadMapSites() {
     const lon = coordinate(cell(row, 4))
     if (!name) return
     if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) {
-      console.warn(`Map: "${name}" (Datas row ${line}) has no valid coordinates and is not shown.`)
+      console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has no valid coordinates and is not shown.`)
       return
     }
     const rawStatus = cell(row, 5)
     let status = STATUS_BY_ALIAS.get(normalizeWords(rawStatus))
     if (!status) {
-      console.warn(`Map: "${name}" (Datas row ${line}) has an unknown status "${rawStatus}"; shown as planned.`)
+      console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has an unknown status "${rawStatus}"; shown as planned.`)
       status = 'planned'
     }
     sites.push({
@@ -153,7 +153,7 @@ export async function loadMapSites() {
           const value = cell(row, measurement.column)
           let state = MEASUREMENT_STATE_BY_ALIAS.get(normalizeWords(value))
           if (!state) {
-            console.warn(`Map: "${name}" (Datas row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
+            console.warn(`Map: "${name}" (${SHEET_TABS.map} row ${line}) has an unknown ${measurement.short} value "${value}"; shown as planned.`)
             state = 'not-started'
           }
           return [measurement.id, state]

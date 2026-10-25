@@ -3,10 +3,20 @@
 // restricted in Google Cloud Console: see README, "Google Sheets API key".
 // Override at build time with VITE_SHEETS_API_KEY in a .env.local file.
 // The spreadsheet (Geotrees_Back-CARTO) must be shared as "Anyone with the link: Viewer".
-// It holds the tabs Datas (the map), Aboutus, Sitesdirectory, Opportunities and News.
+// It holds the tabs Data (the map), Aboutus, Sitesdirectory, Opportunities and News.
 // https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng
 export const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID || '1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng'
-// The map's "Datas" tab is read from the same spreadsheet unless set otherwise
+// Names of the spreadsheet tabs, exactly as shown at the bottom of the sheet.
+// If a tab is renamed in Google Sheets, rename it here too.
+export const SHEET_TABS = {
+  map: 'Data',
+  about: 'Aboutus',
+  directory: 'Sitesdirectory',
+  opportunities: 'Opportunities',
+  news: 'News'
+}
+
+// The map's "Data" tab is read from the same spreadsheet unless set otherwise
 export const MAP_SPREADSHEET_ID = import.meta.env.VITE_MAP_SPREADSHEET_ID || SPREADSHEET_ID
 export const SHEETS_API_KEY = import.meta.env.VITE_SHEETS_API_KEY || 'AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0'
 
@@ -68,7 +78,7 @@ const RED = '#D7372B'
 const ORANGE = '#F28E1C'
 const GREEN = '#53A034'
 
-// State of each measurement (columns I, J, K of the "Datas" tab). "aliases" are the
+// State of each measurement (columns I, J, K of the "Data" tab). "aliases" are the
 // values accepted in those cells; case, accents and extra spaces are ignored.
 export const MEASUREMENT_STATES = [
   {
@@ -102,7 +112,7 @@ export const MEASUREMENTS = [
   { id: 'plot', short: 'Plot', label: 'Forest plot inventory', column: 10 }
 ]
 
-// Site statuses (column F of the "Datas" tab), used by the filters. "aliases" are
+// Site statuses (column F of the "Data" tab), used by the filters. "aliases" are
 // the values accepted in the sheet (case, accents and extra spaces are ignored).
 export const SITE_STATUSES = [
   { id: 'completed', label: 'Completed', color: GREEN, fill: 'full', aliases: ['réalisé', 'realise', 'completed', 'complete', 'done', 'terminé'] },

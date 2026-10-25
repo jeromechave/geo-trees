@@ -40,7 +40,7 @@ of a domain instead, run `VITE_BASE=/ npm run build`.
 The map on the Sites page is part of this site (`src/components/SitesMap.vue`).
 It replaces the separate map previously embedded from `geo-trees.org/carto/`.
 
-**Data.** It reads the `Datas` tab of the same Google Sheet, one row per site:
+**Data.** It reads the `Data` tab of the same Google Sheet, one row per site:
 
 | Column | Content |
 | --- | --- |
@@ -129,9 +129,10 @@ afterwards so they are not lost if someone deploys with `--clean`.
 
 All content comes from the Geotrees_Back-CARTO spreadsheet
 (https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng),
-tabs `Datas`, `Aboutus`, `Sitesdirectory`, `Opportunities` and `News` (other tabs
+tabs `Data`, `Aboutus`, `Sitesdirectory`, `Opportunities` and `News` (other tabs
 are ignored). The tab
-names and column order must stay as they are. The spreadsheet must be shared as
+names and column order must stay as they are; if a tab is renamed, update
+`SHEET_TABS` in `src/config.js`. The spreadsheet must be shared as
 **Anyone with the link: Viewer**, because visitors' browsers read it directly.
 
 To use another spreadsheet without changing the code, set in `.env.local` or the
@@ -139,7 +140,7 @@ build environment:
 
 ```
 VITE_SPREADSHEET_ID=<id>          # all tabs
-VITE_MAP_SPREADSHEET_ID=<id>      # only the map's Datas tab, if it lives elsewhere
+VITE_MAP_SPREADSHEET_ID=<id>      # only the map's Data tab, if it lives elsewhere
 ```
 
 The id is the part of the sheet's address between `/d/` and `/edit`.

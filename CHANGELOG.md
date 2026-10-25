@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.9 (2026-10-24)
+
+### Fixed
+- The map reads the spreadsheet tab `Data` (renamed from `Datas`).
+
+### Added
+- All tab names are set in one place, `SHEET_TABS` in `src/config.js`.
+
 ## 2.0.8 (2026-10-24)
 
 ### Fixed
