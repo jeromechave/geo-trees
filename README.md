@@ -16,7 +16,8 @@ npm run dev
 
 Then open http://localhost:5173. Other commands:
 
-- `npm run build` builds the site into `dist/`.
+- `npm run build` saves a copy of the Google Sheet (see below), then builds the site
+  into `dist/`.
 - `npm run preview` serves that build at http://localhost:4173/geo-trees/.
 - `npm run lint` checks the code.
 
@@ -57,7 +58,6 @@ Google Sheet, one row per site:
 | M | Funders | (hidden) |
 | N, O, P | Partners_Names, Partners_Institutions_Names, Partners_Institutions_Websites | (hidden) |
 | Q, R | Networks_Names, Networks_websites | directory |
-| S, T | PIs email adress, Ayala_updates_track | never read |
 
 Columns J–R hold lists separated by `;` (`Name A; Name B; Name C`), with any
 number of items. In each name/website pair of columns (K–L, O–P, Q–R) the n-th
@@ -108,6 +108,28 @@ zoomed in on a plot. Another year (2020 to 2024) can be chosen with
 The background layers are defined in `MAP_LAYERS` in `src/config.js`. The
 attribution in the map's corner is required by OpenFreeMap/OpenMapTiles,
 OpenStreetMap and EOX: keep it visible.
+
+## Fallback copy of the Google Sheet
+
+Every build (`npm run build`, and so `npm run deploy`) first saves the sheet's
+content in `public/sheet-snapshot.json` (`scripts/snapshot-sheet.js`; also
+`npm run snapshot` on its own). The published site uses it only if Google Sheets
+cannot be reached, so pages still show their content, as of the last build; the
+browser console then says so and gives the date of the copy.
+
+The copy holds only the columns the site uses. It is not stored in git. If Google
+Sheets cannot be read during a build, the previous copy is kept and the build goes on.
+
+A Sheets API key restricted to the site's addresses also works for the copy, because
+the build sends the site's address (`VITE_SITE_URL`, default `https://geo-trees.org/`).
+Otherwise, set `SHEETS_SNAPSHOT_API_KEY` to a key restricted to the Sheets API only.
+
+## Automatic checks (GitHub Actions)
+
+Every push to GitHub, and every pull request, runs `.github/workflows/check.yml`:
+install the locked dependencies, `npm run lint`, `npm run build`, and check that every
+page was built. A green tick or red cross appears next to each commit on GitHub; the
+**Actions** tab shows the details. It publishes nothing.
 
 ## Deploying
 

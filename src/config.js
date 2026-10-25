@@ -1,79 +1,13 @@
-// Google Sheets used as the site's CMS.
-// The API key is visible to visitors (it is called from the browser), so it must be
-// restricted in Google Cloud Console: see README, "Google Sheets API key".
-// Override at build time with VITE_SHEETS_API_KEY in a .env.local file.
-// The spreadsheet (Geotrees_Back-CARTO) must be shared as "Anyone with the link: Viewer".
-// It holds the tabs Data (map and site directory), Aboutus, Opportunities and News.
-// https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng
-export const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID || '1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng'
-// Names of the spreadsheet tabs, exactly as shown at the bottom of the sheet.
-// If a tab is renamed in Google Sheets, rename it here too. The Data tab can also be
-// set with VITE_DATA_TAB in .env.local (for example to try a copy of it first).
-export const SHEET_TABS = {
-  data: import.meta.env.VITE_DATA_TAB || 'Data', // the map and the site directory
-  about: 'Aboutus',
-  opportunities: 'Opportunities',
-  news: 'News'
-}
+import { sheetSettings } from './sheet-layout.js'
 
-// Columns of each tab, listed in their usual order (the first is column A).
-// The site finds each column by its header in row 1 (case, accents, spaces and
-// underscores ignored), so columns can be moved or inserted. If no header matches,
-// it uses the usual position and says so in the browser console.
-// Each field lists the header names it accepts.
-export const SHEET_COLUMNS = {
-  data: {
-    name: ['Site'],
-    description: ['Description'],
-    country: ['Country'],
-    latitude: ['Latitude'],
-    longitude: ['Longitude'],
-    website: ['Site_URL', 'Website'],
-    als: ['ALS'],
-    tls: ['TLS'],
-    plot: ['Inventory', 'Plot'],
-    piNames: ['PI_Names'],
-    piInstitutions: ['PI_Institutions_Names'],
-    supportWebsites: ['Support_Institutions_websites'],
-    funders: ['Funders'],
-    partnerNames: ['Partners_Names'],
-    partnerInstitutions: ['Partners_Institutions_Names'],
-    partnerWebsites: ['Partners_Institutions_Websites'],
-    networks: ['Networks_Names'],
-    networkWebsites: ['Networks_websites']
-    // PI email addresses and update notes are never read by the website
-  },
-  about: {
-    display: ['display'],
-    name: ['name'],
-    group: ['group'],
-    role: ['role'],
-    affiliation: ['affiliation'],
-    image: ['image'],
-    zoom: ['zoom'],
-    link: ['link']
-  },
-  news: {
-    date: ['Date'],
-    title: ['Title'],
-    text: ['Text'],
-    linkText: ['Link_text'],
-    linkUrl: ['Link_url'],
-    image: ['Img_url', 'Image']
-  },
-  opportunities: {
-    category: ['Categorie', 'Category'],
-    date: ['Date'],
-    title: ['Title'],
-    text: ['Text'],
-    linkText: ['Link_text'],
-    linkUrl: ['Link_url']
-  }
-}
-
-// The Data tab (map and site directory) is read from the same spreadsheet unless set otherwise
-export const MAP_SPREADSHEET_ID = import.meta.env.VITE_MAP_SPREADSHEET_ID || SPREADSHEET_ID
-export const SHEETS_API_KEY = import.meta.env.VITE_SHEETS_API_KEY || 'AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0'
+// Google Sheets used as the site's CMS: spreadsheet, API key, tab names and columns
+// are set in src/sheet-layout.js (shared with the build script).
+const sheet = sheetSettings(import.meta.env)
+export const SPREADSHEET_ID = sheet.spreadsheetId
+export const MAP_SPREADSHEET_ID = sheet.mapSpreadsheetId
+export const SHEETS_API_KEY = sheet.apiKey
+export const SHEET_TABS = sheet.tabs
+export { SHEET_COLUMNS } from './sheet-layout.js'
 
 // Where the images named in the spreadsheet (people, partner logos) are hosted
 export const SHEET_IMAGE_BASE = 'https://geo-trees.org/geo-trees/img/'

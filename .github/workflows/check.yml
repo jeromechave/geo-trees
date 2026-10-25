@@ -1,0 +1,39 @@
+# Checks every push and pull request: installs the exact locked dependencies, runs
+# the code checks (lint) and builds the site. A red cross on GitHub means one of these
+# failed; the "Actions" tab shows which step and why. Nothing is published from here.
+name: Check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies (exact versions from package-lock.json)
+        run: npm ci
+
+      - name: Check the code
+        run: npm run lint
+
+      - name: Build the site (also saves a copy of the Google Sheet)
+        run: npm run build
+
+      - name: Check the build output
+        run: |
+          for page in index about-us project sites data contact opportunities news; do
+            test -s "dist/$page.html" || { echo "missing dist/$page.html"; exit 1; }
+          done
+          if [ -s dist/sheet-snapshot.json ]; then echo "Sheet copy included"; else echo "::warning::No sheet copy in this build (Google Sheets could not be read from GitHub)"; fi

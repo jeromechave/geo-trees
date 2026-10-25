@@ -1,6 +1,6 @@
 {
   "name": "geo-trees",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,10 +8,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/snapshot-sheet.js && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "deploy": "node gh-pages-deploy.js"
+    "deploy": "node gh-pages-deploy.js",
+    "snapshot": "node scripts/snapshot-sheet.js"
   },
   "dependencies": {
     "@maplibre/maplibre-gl-leaflet": "0.1.4",

@@ -2,11 +2,13 @@ import {
   MAP_SPREADSHEET_ID,
   MEASUREMENT_STATES,
   MEASUREMENTS,
-  SHEET_COLUMNS,
   SHEET_TABS,
   SHEETS_API_KEY,
   SPREADSHEET_ID
 } from '@/config'
+import { columnLetter, resolveColumns, slugify } from '@/sheet-layout'
+
+export { slugify }
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -89,40 +91,25 @@ async function fetchRange(range, spreadsheetId) {
   return body.valueRanges[0].values || []
 }
 
-const normalizeHeader = (header) => slugify(header).replace(/-/g, '')
+// The copy of the sheet saved at each build (scripts/snapshot-sheet.js), used when
+// Google Sheets cannot be reached. Loaded only when needed.
+let snapshot
+const loadSnapshot = () =>
+  (snapshot ||= fetch(`${import.meta.env.BASE_URL}sheet-snapshot.json`)
+    .then((response) => (response.ok ? response.json() : null))
+    .catch(() => null))
 
-// 0 -> "A", 25 -> "Z", 26 -> "AA"
-function columnLetter(index) {
-  let letters = ''
-  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) letters = String.fromCharCode(65 + ((n - 1) % 26)) + letters
-  return letters
-}
-
-// Reads one tab. Its header row is read first to find each column of SHEET_COLUMNS,
-// then only the rows up to the last column needed. Returns the non-empty rows, each
-// with its spreadsheet row number and functions to read a field as text, as a list
-// ("a; b") or as web addresses.
-async function readTab(tabKey, spreadsheetId = SPREADSHEET_ID) {
+// Rows of a tab as records: each with its spreadsheet row number and functions to read
+// a field as text, as a list ("a; b") or as web addresses.
+function toRecords(tabKey, header, values) {
   const tab = SHEET_TABS[tabKey]
-  const [header = []] = await fetchRange(`${tab}!1:1`, spreadsheetId)
-  const positions = new Map()
-  header.forEach((title, index) => {
-    const key = normalizeHeader(title)
-    if (key && !positions.has(key)) positions.set(key, index)
-  })
-  const columns = {}
-  Object.entries(SHEET_COLUMNS[tabKey]).forEach(([field, titles], usual) => {
-    const found = titles.map((title) => positions.get(normalizeHeader(title))).find((index) => index !== undefined)
-    if (found === undefined) {
-      console.warn(
-        `Sheet: no column "${titles[0]}" in tab "${tab}"; using column ${columnLetter(usual)} ` +
-          `("${header[usual] || 'no header'}") instead. Check the header in row 1.`
-      )
-    }
-    columns[field] = found === undefined ? usual : found
-  })
-  const last = columnLetter(Math.max(...Object.values(columns)))
-  const values = await fetchRange(`${tab}!A2:${last}10000`, spreadsheetId)
+  const { columns, missing } = resolveColumns(tabKey, header)
+  missing.forEach(({ title, usual, header: found }) =>
+    console.warn(
+      `Sheet: no column "${title}" in tab "${tab}"; using column ${columnLetter(usual)} ` +
+        `("${found || 'no header'}") instead. Check the header in row 1.`
+    )
+  )
   return values
     .map((row, index) => ({ row, line: index + 2 }))
     .filter(({ row }) => row.some((value) => String(value).trim() !== ''))
@@ -132,6 +119,23 @@ async function readTab(tabKey, spreadsheetId = SPREADSHEET_ID) {
       list: (field) => list(row, columns[field]),
       urls: (field, where) => urls(row, columns[field], where)
     }))
+}
+
+// Reads one tab: its header row first, to find the columns, then the rows up to the
+// last column the site uses. If Google Sheets fails, the saved copy is used instead.
+async function readTab(tabKey, spreadsheetId = SPREADSHEET_ID) {
+  const tab = SHEET_TABS[tabKey]
+  try {
+    const [header = []] = await fetchRange(`${tab}!1:1`, spreadsheetId)
+    const values = await fetchRange(`${tab}!A2:${resolveColumns(tabKey, header).lastColumn}10000`, spreadsheetId)
+    return toRecords(tabKey, header, values)
+  } catch (error) {
+    const saved = await loadSnapshot()
+    const copy = saved && saved.tabs && saved.tabs[tabKey]
+    if (!copy || copy.tab !== tab) throw error
+    console.warn(`Sheet: could not read tab "${tab}" (${error.message}); showing the copy saved on ${copy.savedAt}.`)
+    return toRecords(tabKey, copy.header, copy.rows)
+  }
 }
 
 export async function loadAbout() {
@@ -176,16 +180,6 @@ export async function loadOpportunities() {
   })
   return groupBy(items, 'categorie')
 }
-
-// "Lopé National Park" -> "lope-national-park". Used to link a site on the map to
-// its entry in the site directory, and to read sheet values tolerantly.
-export const slugify = (value) =>
-  String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
 
 const normalizeWords = (value) => slugify(value).replace(/-/g, ' ')
 

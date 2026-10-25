@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.18 (2026-10-25)
+
+### Added
+- Fallback copy of the Google Sheet: each build saves the content the site uses in
+  `sheet-snapshot.json`; if Google Sheets cannot be reached, pages show that copy
+  instead of an error. Downloaded only in that case (about 32 kB compressed).
+- GitHub Actions check on every push and pull request: install, lint, build.
+- `npm run snapshot` to save the copy on its own.
+
+### Changed
+- The sheet's layout (spreadsheet, key, tabs, columns and how columns are found)
+  moved to `src/sheet-layout.js`, shared by the site and the build script.
+- The removed private columns (PI emails, update notes) are no longer mentioned.
+
 ## 2.0.17 (2026-10-24)
 
 ### Changed
