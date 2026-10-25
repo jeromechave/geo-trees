@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.6 (2026-10-24)
+
+### Changed
+- Content is read from the Geotrees_Back-CARTO spreadsheet
+  `1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng` (was
+  `16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538`).
+
+### Added
+- `VITE_SPREADSHEET_ID` to change the spreadsheet without editing the code, and
+  `VITE_MAP_SPREADSHEET_ID` to read the map's `Datas` tab from a separate one.
+
 ## 2.0.5 (2026-10-24)
 
 ### Changed

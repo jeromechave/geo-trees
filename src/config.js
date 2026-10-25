@@ -2,7 +2,12 @@
 // The API key is visible to visitors (it is called from the browser), so it must be
 // restricted in Google Cloud Console: see README, "Google Sheets API key".
 // Override at build time with VITE_SHEETS_API_KEY in a .env.local file.
-export const SPREADSHEET_ID = '16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538'
+// The spreadsheet (Geotrees_Back-CARTO) must be shared as "Anyone with the link: Viewer".
+// It holds the tabs Aboutus, news, opportunities, Sitesdirectory and Datas (the map).
+// https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng
+export const SPREADSHEET_ID = import.meta.env.VITE_SPREADSHEET_ID || '1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng'
+// The map's "Datas" tab is read from the same spreadsheet unless set otherwise
+export const MAP_SPREADSHEET_ID = import.meta.env.VITE_MAP_SPREADSHEET_ID || SPREADSHEET_ID
 export const SHEETS_API_KEY = import.meta.env.VITE_SHEETS_API_KEY || 'AIzaSyA1-lEBOiEyohPSN9jBFTDG51qsmp5-Kn0'
 
 // Where the images named in the spreadsheet (people, partner logos) are hosted

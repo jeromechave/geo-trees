@@ -125,6 +125,24 @@ Without a local setup, you can still upload it directly to `gh-pages`:
 Deployments keep files uploaded this way, but please also add them to `public/`
 afterwards so they are not lost if someone deploys with `--clean`.
 
+## Google Sheet
+
+All content comes from the Geotrees_Back-CARTO spreadsheet
+(https://docs.google.com/spreadsheets/d/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng),
+tabs `Aboutus`, `news`, `opportunities`, `Sitesdirectory` and `Datas`. The tab
+names and column order must stay as they are. The spreadsheet must be shared as
+**Anyone with the link: Viewer**, because visitors' browsers read it directly.
+
+To use another spreadsheet without changing the code, set in `.env.local` or the
+build environment:
+
+```
+VITE_SPREADSHEET_ID=<id>          # all tabs
+VITE_MAP_SPREADSHEET_ID=<id>      # only the map's Datas tab, if it lives elsewhere
+```
+
+The id is the part of the sheet's address between `/d/` and `/edit`.
+
 ## Google Sheets API key
 
 The key is in `src/config.js`. It is called from the browser, so it is visible to
@@ -140,7 +158,7 @@ To check, request the sheet without a referrer. A restricted key answers
 `403` with `API_KEY_HTTP_REFERRER_BLOCKED`:
 
 ```
-curl -s "https://sheets.googleapis.com/v4/spreadsheets/16qusGlajdZwqx6lX_RIxuWoxmiQqhxf-Guzwe4hI538/values/news!A1:A1?key=<KEY>"
+curl -s "https://sheets.googleapis.com/v4/spreadsheets/1YEtBjP4UZ5L0VtHnMXWZifZ50j74ezvsNmhjHiNPfng/values/news!A1:A1?key=<KEY>"
 ```
 
 Once the key is restricted to the live domains, the sheet data will not load on

@@ -1,4 +1,4 @@
-import { MEASUREMENT_STATES, MEASUREMENTS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
+import { MAP_SPREADSHEET_ID, MEASUREMENT_STATES, MEASUREMENTS, SPREADSHEET_ID, SHEETS_API_KEY, SITE_STATUSES } from '@/config'
 
 // The Sheets API leaves out empty cells at the end of a row, so any column
 // may be missing. These helpers always return a string / an array.
@@ -17,9 +17,9 @@ const groupBy = (items, key) =>
     return groups
   }, {})
 
-async function fetchRange(range) {
+async function fetchRange(range, spreadsheetId = SPREADSHEET_ID) {
   const url =
-    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values:batchGet` +
+    `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values:batchGet` +
     `?ranges=${encodeURIComponent(range)}&key=${SHEETS_API_KEY}`
   const response = await fetch(url)
   if (!response.ok) {
@@ -116,7 +116,7 @@ const coordinate = (value) => parseFloat(value.replace(',', '.'))
 
 // "Datas" tab: one row per site shown on the map
 export async function loadMapSites() {
-  const rows = await fetchRange('Datas!A2:K10000')
+  const rows = await fetchRange('Datas!A2:K10000', MAP_SPREADSHEET_ID)
   const sites = []
   rows.forEach((row, index) => {
     const line = index + 2 // spreadsheet row number, for messages
