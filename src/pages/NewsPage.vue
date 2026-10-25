@@ -55,7 +55,7 @@ const { data: newsData, error } = useSheet(loadNews)
           color: #213043;
           font-family: "Lato-Bold";
           padding: 10px 0px;
-          line-height: 35px;
+          line-height: 1.75;
           margin-bottom: 10px;
         }
         .news-item{
@@ -78,27 +78,27 @@ const { data: newsData, error } = useSheet(loadNews)
           .news-item-content{
             width: calc(75% - 20px);
             .news-item-date{
-              font-size: 16px;
+              font-size: 14px;
               color: #213043;
               font-family: "Lato-Regular";
               margin-bottom: 10px;
             }
             .news-item-title{
-              font-size: 20px;
+              font-size: 17px;
               color: #213043;
               font-family: "Lato-Bold";
               margin-bottom: 15px;
             }
             .news-item-text{
-              font-size: 20px;
+              font-size: 17px;
               color: #213043;
               font-family: "Lato-Regular";
               margin-bottom: 10px;
-              line-height: 35px;
+              line-height: 1.75;
               display: inline-block;
             }
             .news-item-link{
-              font-size: 20px;
+              font-size: 17px;
               color: #213043;
               font-family: "Lato-Regular";
               margin-bottom: 10px;

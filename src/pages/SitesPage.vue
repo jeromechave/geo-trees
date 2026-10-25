@@ -191,7 +191,7 @@ function showOnMap(site) {
                 }
               }
               .site-name-container{
-                font-size: 20px;
+                font-size: 17px;
                 font-family:"Lato-Bold";
                 color: #53A034;
                 cursor: pointer;

@@ -96,11 +96,11 @@ import SiteHeader from '@/components/SiteHeader.vue'
           span{
             display: inline-block;
             text-align: left;
-            font-size: 20px;
+            font-size: 17px;
             color: #213043;
             font-family: "Lato-Regular";
             padding: 10px 20px;
-            line-height: 35px;
+            line-height: 1.75;
             a{
               color: #53A034;
               text-decoration: none;
@@ -118,7 +118,7 @@ import SiteHeader from '@/components/SiteHeader.vue'
         color: #213043;
         font-family: "Lato-Bold";
         padding: 10px 20px;
-        line-height: 35px;
+        line-height: 1.75;
         margin-bottom: 10px;
       }
       .news-item{
@@ -126,28 +126,28 @@ import SiteHeader from '@/components/SiteHeader.vue'
         text-align: left;
         padding: 20px 20px;
         .news-item-date{
-          font-size: 16px;
+          font-size: 14px;
           color: #213043;
           font-family: "Lato-Regular";
           margin-bottom: 10px;
         }
       }
       .news-item-title{
-        font-size: 20px;
+        font-size: 17px;
         color: #213043;
         font-family: "Lato-Bold";
         margin-bottom: 15px;
       }
       .news-item-text{
-        font-size: 20px;
+        font-size: 17px;
         color: #213043;
         font-family: "Lato-Regular";
         margin-bottom: 10px;
-        line-height: 35px;
+        line-height: 1.75;
         display: inline;
       }
       .news-item-link{
-        font-size: 20px;
+        font-size: 17px;
         color: #213043;
         font-family: "Lato-Regular";
         margin-bottom: 10px;
@@ -197,9 +197,9 @@ import SiteHeader from '@/components/SiteHeader.vue'
             margin-bottom: 0px;
           }
           .homepage-intro{
-            font-size: 18px;
+            font-size: 15px;
             span{
-              line-height: 32px;
+              line-height: 1.75;
             }
           }
         }

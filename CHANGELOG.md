@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.15 (2026-10-24)
+
+### Changed
+- Smaller body text on every page: 20 px → 17 px, 18 px → 15 px (narrow screens
+  and secondary text), 16 px → 14 px. Headings are unchanged. Line heights are now
+  relative to the text size (1.75), so spacing shrinks with it.
+- Contact: the download buttons sit side by side (one per line, equal width, on
+  phones). The whole button is now the link, not only its text.
+
 ## 2.0.14 (2026-10-24)
 
 Goes with GEOTREES_Supersites_fixed.xlsx, where every list cell is written

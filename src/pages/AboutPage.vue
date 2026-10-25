@@ -135,7 +135,7 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
         a{ 
           text-decoration: none;
           font-family: "Lato-Regular";
-          font-size: 18px;
+          font-size: 15px;
           color: #213043;
           text-decoration: underline;
         }
@@ -176,14 +176,14 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
           }
           h3{
             font-family: "Lato-Bold";
-            font-size: 20px;
+            font-size: 17px;
             margin-top: 10px;
             margin-bottom: 10px;
           }
           span{
             display: block;
             font-family: "Lato-Regular";
-            font-size: 18px;
+            font-size: 15px;
             margin-bottom: 5px;
           }
         }
@@ -231,14 +231,14 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
           }
           h3{
             font-family: "Lato-Bold";
-            font-size: 18px;
+            font-size: 15px;
             margin-top: 5px;
             margin-bottom: 5px;
           }
           span{
             display: block;
             font-family: "Lato-Regular";
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 5px;
           }
         }
@@ -317,10 +317,10 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
             width: 50%;
           }
           h3{
-            font-size: 18px;
+            font-size: 15px;
           }
           span{
-            font-size: 16px;
+            font-size: 14px;
           }
         }
         .community-member-list{

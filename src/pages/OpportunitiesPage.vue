@@ -67,28 +67,28 @@ const opportunitiesData = computed(() => data.value || {})
           display: inline-block;
           text-align: left;
           .opportunities-item-date{
-            font-size: 16px;
+            font-size: 14px;
             color: #213043;
             font-family: "Lato-Regular";
             margin-bottom: 10px;
           }
         }
         .opportunities-item-title{
-          font-size: 20px;
+          font-size: 17px;
           color: #213043;
           font-family: "Lato-Bold";
           margin-bottom: 15px;
         }
         .opportunities-item-text{
-          font-size: 20px;
+          font-size: 17px;
           color: #213043;
           font-family: "Lato-Regular";
           margin-bottom: 20px;
-          line-height: 35px;
+          line-height: 1.75;
           display: inline-block;
         }
         .opportunities-item-link{
-          font-size: 20px;
+          font-size: 17px;
           color: #213043;
           font-family: "Lato-Regular";
           margin-bottom: 10px;

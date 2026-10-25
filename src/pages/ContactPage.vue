@@ -15,36 +15,18 @@
         <h2>Download our terms of reference</h2>
         <span class="default-text">Date : 15/07/2025. This is an evolving document and we are happy to discuss this with partners.</span>
         <div class="link-container">
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEO-TREES_ToR_English.pdf" target="_blank">PDF - English version</a>
-          </span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEO-TREES_ToR_French.pdf" target="_blank">PDF - French version</a></span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEO-TREES_ToR_Spanish.pdf" target="_blank">PDF - Spanish version</a></span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEO-TREES_ToR_Portuguese" target="_blank">PDF - Portuguese version</a></span>
+          <a v-for="file in termsOfReference" :key="file.url" class="link-text" :href="file.url" download target="_blank">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path :d="downloadIcon" /></svg>
+            {{ file.label }}
+          </a>
         </div>
         <h2>Download our code of conduct </h2>
         <span class="default-text">Date : 15/04/2026.</span>
         <div class="link-container">
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_English.pdf" target="_blank">PDF - English version</a>
-          </span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_French.pdf" target="_blank">PDF - French version</a></span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_Spanish.pdf" target="_blank">PDF - Spanish version</a></span>
-          <span class="link-text">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>
-            <a download href="https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_Portuguese.pdf" target="_blank">PDF - Portuguese version</a></span>
+          <a v-for="file in codeOfConduct" :key="file.url" class="link-text" :href="file.url" download target="_blank">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path :d="downloadIcon" /></svg>
+            {{ file.label }}
+          </a>
         </div>
       </div>
     </div>
@@ -54,6 +36,23 @@
 
 <script setup>
 import SiteHeader from '@/components/SiteHeader.vue'
+
+const termsOfReference = [
+  { label: 'PDF - English version', url: 'https://geo-trees.org/downloads/GEO-TREES_ToR_English.pdf' },
+  { label: 'PDF - French version', url: 'https://geo-trees.org/downloads/GEO-TREES_ToR_French.pdf' },
+  { label: 'PDF - Spanish version', url: 'https://geo-trees.org/downloads/GEO-TREES_ToR_Spanish.pdf' },
+  { label: 'PDF - Portuguese version', url: 'https://geo-trees.org/downloads/GEO-TREES_ToR_Portuguese' }
+]
+
+const codeOfConduct = [
+  { label: 'PDF - English version', url: 'https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_English.pdf' },
+  { label: 'PDF - French version', url: 'https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_French.pdf' },
+  { label: 'PDF - Spanish version', url: 'https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_Spanish.pdf' },
+  { label: 'PDF - Portuguese version', url: 'https://geo-trees.org/downloads/GEOTREES Code of Conduct 2025 FINAL_Portuguese.pdf' }
+]
+
+const downloadIcon =
+  'M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z'
 </script>
 
 <style lang="scss">
@@ -67,20 +66,36 @@ import SiteHeader from '@/components/SiteHeader.vue'
         h2:nth-of-type(2) {
           margin-top: 75px;
         }
+        // download buttons side by side, wrapping onto new lines on narrow screens
         .link-container{
-          display: inline-block;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 20px;
           .link-text{
-            display: block;
-            width: 310px;
-            margin: 20px auto 0 auto;
-            font-size: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            padding: 10px 16px;
+            font-size: 15px;
+            color: #213043;
+            text-decoration: none;
+            &:hover{
+              text-decoration: underline;
+            }
             svg{
-              width: 20px;
-              height: 20px;
-              margin-right: 10px;
-              transform: translateY(2px);
+              flex: none;
+              width: 16px;
+              height: 16px;
               fill: #213043;
             }
+          }
+        }
+        @media (max-width: 767px){
+          // one button per line on phones, all the same width
+          .link-container .link-text{
+            flex: 1 1 100%;
           }
         }
       }

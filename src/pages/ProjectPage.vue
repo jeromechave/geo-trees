@@ -153,7 +153,7 @@ import SiteHeader from '@/components/SiteHeader.vue'
               height: 100%;
               background-color: rgba(999,999, 999, 0.75);
               color: #000;
-              font-size: 16px;
+              font-size: 14px;
               font-family: "Lato-Light";
               text-align: center;
               align-items: center;
@@ -194,7 +194,7 @@ import SiteHeader from '@/components/SiteHeader.vue'
                   left: 50%;
                   transform: translate(-50%, -50%);
                   color: #fff;
-                  font-size: 16px;
+                  font-size: 14px;
                   font-family: "Lato-Bold";
                   white-space: nowrap;
                 }
