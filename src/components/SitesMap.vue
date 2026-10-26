@@ -58,7 +58,7 @@
     <div class="sites-map-controls">
       <button type="button" aria-label="Zoom in" @click="map && map.zoomIn()">+</button>
       <button type="button" aria-label="Zoom out" @click="map && map.zoomOut()">−</button>
-      <button type="button" aria-label="Show all sites" class="reset" @click="resetView">
+      <button type="button" aria-label="Show the whole globe" class="reset" @click="resetView">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -90,18 +90,31 @@
       </div>
     </aside>
 
+    <!-- Credits required by the background map's data providers -->
+    <p class="sites-map-credits">
+      <template v-for="(credit, i) in credits" :key="i">
+        <a v-if="credit.url" :href="credit.url" target="_blank" rel="noopener">{{ credit.text }}</a>
+        <span v-else>{{ credit.text }}</span>
+        {{ ' ' }}
+      </template>
+      · <a href="https://maplibre.org" target="_blank" rel="noopener">MapLibre</a>
+    </p>
+
     <p v-if="loading" class="sites-map-message">Loading sites…</p>
     <p v-else-if="error" class="sites-map-message" role="alert">
       The sites could not be loaded. Check your connection and reload the page.
+    </p>
+    <p v-else-if="noWebGL" class="sites-map-message" role="alert">
+      This browser cannot display the map (WebGL is not available). The list of sites is below.
     </p>
   </section>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
-import { MAP_FALLBACK_LAYER, MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS } from '@/config'
+import { MAP_LAYERS, MEASUREMENT_STATES, MEASUREMENTS } from '@/config'
 import { linkLabels, loadMapSites, slugify } from '@/lib/sheets'
-import { loadLeaflet, loadVectorSupport, supportsWebGL } from '@/lib/leaflet'
+import { loadMapLibre, supportsWebGL } from '@/lib/maplibre'
 import { repel } from '@/lib/repel'
 
 const props = defineProps({
@@ -124,19 +137,19 @@ const map = shallowRef(null)
 const sites = shallowRef([])
 const loading = ref(true)
 const error = ref(null)
+const noWebGL = ref(false)
 const query = ref('')
 const selected = shallowRef(null)
 const activeLayer = ref(MAP_LAYERS[0].id)
 const zoom = ref(0)
 
-let L
-let markerLayer
-let tileLayers = {}
-const markers = new Map() // site.id -> Leaflet marker
+let maplibregl
+const markers = new Map() // site.id -> { site, marker, leaderMarker }
 
 const stateOf = (site, measurement) => MEASUREMENT_STATES.find((state) => state.id === site.measurements[measurement.id])
 const showLabels = computed(() => zoom.value >= LABEL_ZOOM)
 const hasDirectoryEntry = (site) => props.directorySlugs.has(site.slug)
+const credits = computed(() => MAP_LAYERS.find((layer) => layer.id === activeLayer.value).credits)
 
 const searchResults = computed(() => {
   const words = slugify(query.value)
@@ -149,12 +162,40 @@ const searchResults = computed(() => {
     .slice(0, 8)
 })
 
-// A site is drawn with two markers: in a layer below all bars, a dot at its true
-// position and a leader line to its bar (shown only when the bar had to move to
-// avoid another one); above, the bar itself with the name above it.
-const leaderHtml = '<span class="site-marker-leader"></span><span class="site-marker-anchor"></span>'
+// ---------- background maps ----------
 
-function markerHtml(site) {
+// The globe is shown at world scale and becomes a flat map as one zooms in, so
+// areas are not inflated towards the poles as on a flat Mercator world map.
+const PROJECTION = { type: 'globe' }
+
+function styleFor(layer) {
+  if (layer.type === 'vector') return layer.style
+  return {
+    version: 8,
+    sources: { background: { type: 'raster', tiles: [layer.url], tileSize: 256, maxzoom: layer.maxZoom || 18 } },
+    layers: [{ id: 'background', type: 'raster', source: 'background' }]
+  }
+}
+
+watch(activeLayer, (id) => {
+  if (map.value) map.value.setStyle(styleFor(MAP_LAYERS.find((layer) => layer.id === id)), { diff: false })
+})
+
+// ---------- site markers ----------
+
+// A site is drawn with two markers: first (so, below all bars) a dot at its true
+// position and a leader line to its bar, shown only when the bar had to move to
+// avoid another one; then the bar itself, with the site name above it.
+function leaderElement() {
+  const element = document.createElement('div')
+  element.className = 'site-leader'
+  element.innerHTML = '<span class="site-marker-leader"></span><span class="site-marker-anchor"></span>'
+  return element
+}
+
+function barElement(site) {
+  const element = document.createElement('div')
+  element.className = 'site-marker'
   const label = document.createElement('span')
   label.className = 'site-marker-label'
   label.textContent = site.name // textContent: names from the sheet are never parsed as HTML
@@ -162,7 +203,18 @@ function markerHtml(site) {
     const state = stateOf(site, measurement)
     return `<span class="site-bar-square fill-${state.fill}" style="--c:${state.color}"></span>`
   }).join('')
-  return `<span class="site-marker-body">${label.outerHTML}<span class="site-bar">${squares}</span></span>`
+  element.innerHTML = `<span class="site-marker-body">${label.outerHTML}<span class="site-bar">${squares}</span></span>`
+  element.setAttribute('role', 'button')
+  element.setAttribute('tabindex', '0')
+  element.setAttribute('aria-label', markerDescription(site))
+  element.addEventListener('click', () => selectSite(site))
+  element.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      selectSite(site)
+    }
+  })
+  return element
 }
 
 const markerDescription = (site) =>
@@ -179,14 +231,17 @@ function labelWidth(site) {
   return labelWidths.get(site.id)
 }
 
-// Moves bars apart so that none overlap at the current zoom level (see lib/repel.js).
-// Runs after every zoom; panning does not change the layout.
+// Sites on the far side of the globe are hidden by MapLibre (class added below)
+const isHidden = (marker) => marker.getElement().classList.contains('maplibregl-marker-covered')
+
+// Moves bars apart so that none overlap (see lib/repel.js). On a globe, positions
+// change when it turns as well as when zooming, so this runs after every move.
 function layoutMarkers() {
   if (!map.value || markers.size === 0) return
-  const entries = [...markers.values()]
+  const entries = [...markers.values()].filter(({ marker }) => !isHidden(marker))
   const withLabels = showLabels.value
-  const items = entries.map(({ site, marker }) => {
-    const point = map.value.latLngToLayerPoint(marker.getLatLng())
+  const items = entries.map(({ site }) => {
+    const point = map.value.project([site.lon, site.lat])
     if (!withLabels) return { x: point.x, y: point.y, width: BAR.width, height: BAR.height }
     // the box covers the bar and the name above it
     const height = BAR.height + LABEL.gap + LABEL.height
@@ -195,88 +250,90 @@ function layoutMarkers() {
   // 5 px between bars, so a hovered or selected (enlarged) bar never touches another
   const offsets = repel(items, { gap: 5 })
   entries.forEach(({ marker, leaderMarker }, i) => {
-    const element = marker.getElement()
-    const leaderElement = leaderMarker.getElement()
-    if (!element || !leaderElement) return
     const { dx, dy } = offsets[i]
     const distance = Math.hypot(dx, dy)
-    element.querySelector('.site-marker-body').style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`
-    leaderElement.classList.toggle('displaced', distance > 2)
-    const leader = leaderElement.querySelector('.site-marker-leader')
-    leader.style.width = `${distance.toFixed(1)}px`
-    leader.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`
+    marker.getElement().querySelector('.site-marker-body').style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`
+    const leader = leaderMarker.getElement()
+    leader.classList.toggle('displaced', distance > 2)
+    const line = leader.querySelector('.site-marker-leader')
+    line.style.width = `${distance.toFixed(1)}px`
+    line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`
   })
 }
 
 function renderMarkers() {
-  if (!markerLayer) return
-  markerLayer.clearLayers()
+  markers.forEach(({ marker, leaderMarker }) => {
+    marker.remove()
+    leaderMarker.remove()
+  })
   markers.clear()
-  sites.value
-    .forEach((site) => {
-      const marker = L.marker([site.lat, site.lon], {
-        icon: L.divIcon({ className: 'site-marker', html: markerHtml(site), iconSize: [BAR.width, BAR.height] }),
-        riseOnHover: true
-      })
-      marker.on('click', () => selectSite(site))
-      marker.on('add', () => {
-        const element = marker.getElement()
-        element.setAttribute('role', 'button')
-        element.setAttribute('aria-label', markerDescription(site))
-        // Leaflet makes markers focusable but does not open them with the keyboard
-        element.onkeydown = (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            selectSite(site)
-          }
-        }
-        element.classList.toggle('selected', selected.value === site)
-      })
-      const leaderMarker = L.marker([site.lat, site.lon], {
-        pane: 'siteLeaders',
-        interactive: false,
-        keyboard: false,
-        icon: L.divIcon({ className: 'site-leader', html: leaderHtml, iconSize: [BAR.width, BAR.height] })
-      })
-      markers.set(site.id, { site, marker, leaderMarker })
-      markerLayer.addLayer(leaderMarker)
-      markerLayer.addLayer(marker)
-    })
+  const options = { anchor: 'center', opacityWhenCovered: '0', subpixelPositioning: true }
+  // all leaders first, so that every bar is drawn above every leader
+  sites.value.forEach((site) => {
+    const leaderMarker = new maplibregl.Marker({ ...options, element: leaderElement() }).setLngLat([site.lon, site.lat]).addTo(map.value)
+    markers.set(site.id, { site, leaderMarker })
+  })
+  sites.value.forEach((site) => {
+    const marker = new maplibregl.Marker({ ...options, element: barElement(site) }).setLngLat([site.lon, site.lat]).addTo(map.value)
+    markers.get(site.id).marker = marker
+  })
   layoutMarkers()
 }
 
-function fitAll() {
-  const visible = [...markers.values()].map((entry) => entry.marker)
-  if (!map.value || visible.length === 0) return
-  map.value.fitBounds(L.featureGroup(visible).getBounds(), { padding: [40, 40], maxZoom: 8 })
+// ---------- view ----------
+
+// A globe shows one hemisphere at a time: turn it to the side with the most sites
+function bestCenter() {
+  const radians = (degrees) => (degrees * Math.PI) / 180
+  const lat = sites.value.reduce((sum, site) => sum + site.lat, 0) / (sites.value.length || 1)
+  let best = { lon: 0, count: -1 }
+  for (let lon = -180; lon < 180; lon += 5) {
+    // sites less than 80° away (along the globe) from this centre are well in view
+    const count = sites.value.filter((site) => {
+      const cos = Math.sin(radians(lat)) * Math.sin(radians(site.lat)) +
+        Math.cos(radians(lat)) * Math.cos(radians(site.lat)) * Math.cos(radians(site.lon - lon))
+      return cos > Math.cos(radians(80))
+    }).length
+    if (count > best.count) best = { lon, count }
+  }
+  return [best.lon, lat]
+}
+
+// Zoom at which the whole globe fits in the map, with a margin
+function globeZoom() {
+  const size = Math.min(mapElement.value.clientWidth, mapElement.value.clientHeight)
+  return Math.log2((0.42 * size * 2 * Math.PI) / 512)
+}
+
+function showGlobe({ animate = true } = {}) {
+  if (!map.value) return
+  const view = { center: bestCenter(), zoom: globeZoom() }
+  if (animate) map.value.easeTo({ ...view, duration: 1000 })
+  else map.value.jumpTo(view)
 }
 
 function resetView() {
   closePanel()
-  fitAll()
+  showGlobe()
 }
 
 function selectSite(site, { fly = false } = {}) {
   query.value = ''
   selected.value = selected.value === site && !fly ? null : site
-  if (selected.value && fly) {
-    nextTick(() => {
-      const entry = markers.get(site.id)
-      if (entry) flyToSite(entry.marker.getLatLng())
-    })
-  }
+  if (selected.value && fly) flyToSite(site)
   if (selected.value) nextTick(() => panel.value && panel.value.focus({ preventScroll: true }))
 }
 
 // On small screens the panel covers the bottom of the map: aim higher so the site stays visible
-function flyToSite(latLng) {
-  const zoomLevel = Math.max(map.value.getZoom(), 7)
-  let target = latLng
-  if (window.matchMedia('(max-width: 700px)').matches) {
-    const offset = map.value.getSize().y * 0.2
-    target = map.value.unproject(map.value.project(latLng, zoomLevel).add([0, offset]), zoomLevel)
-  }
-  map.value.flyTo(target, zoomLevel, { duration: 1.2 })
+function flyToSite(site) {
+  const small = window.matchMedia('(max-width: 700px)').matches
+  map.value.flyTo({
+    center: [site.lon, site.lat],
+    zoom: Math.max(map.value.getZoom(), 7),
+    offset: [0, small ? -mapElement.value.clientHeight * 0.2 : 0],
+    duration: 1200,
+    essential: true
+  })
 }
 
 function closePanel() {
@@ -292,78 +349,52 @@ defineExpose({ focusSite })
 
 watch(selected, (site) => {
   markers.forEach(({ marker }, id) => {
-    const element = marker.getElement()
-    if (element) element.classList.toggle('selected', Boolean(site) && site.id === id)
+    if (marker) marker.getElement().classList.toggle('selected', Boolean(site) && site.id === id)
   })
-})
-
-// Background layers are created the first time they are shown
-async function createBackground(layer) {
-  if (layer.type === 'vector') {
-    if (supportsWebGL()) {
-      const maplibreGL = await loadVectorSupport()
-      return maplibreGL({ style: layer.style, attributionControl: { customAttribution: layer.attribution } })
-    }
-    layer = MAP_FALLBACK_LAYER
-  }
-  return L.tileLayer(layer.url, {
-    attribution: layer.attribution,
-    maxZoom: layer.maxZoom || 18,
-    maxNativeZoom: layer.maxNativeZoom || layer.maxZoom || 18
-  })
-}
-
-let backgroundRequest = 0
-async function showBackground(id) {
-  const request = ++backgroundRequest
-  if (!tileLayers[id]) tileLayers[id] = await createBackground(MAP_LAYERS.find((layer) => layer.id === id))
-  if (request !== backgroundRequest || !map.value) return // the user switched again meanwhile
-  Object.entries(tileLayers).forEach(([layerId, layer]) => {
-    if (layerId !== id && map.value.hasLayer(layer)) map.value.removeLayer(layer)
-  })
-  if (!map.value.hasLayer(tileLayers[id])) tileLayers[id].addTo(map.value)
-}
-
-watch(activeLayer, (id) => {
-  if (map.value) showBackground(id)
 })
 
 onMounted(async () => {
   try {
-    const [leaflet, loadedSites] = await Promise.all([loadLeaflet(), loadMapSites()])
-    L = leaflet
+    const loadedSites = await loadMapSites()
     sites.value = loadedSites
     emit('sites-loaded', new Set(loadedSites.map((site) => site.slug)))
-
-    map.value = L.map(mapElement.value, {
-      zoomControl: false,
-      minZoom: 2,
+    if (!supportsWebGL()) {
+      noWebGL.value = true
+      return
+    }
+    maplibregl = await loadMapLibre()
+    map.value = new maplibregl.Map({
+      container: mapElement.value,
+      style: styleFor(MAP_LAYERS[0]),
+      center: [0, 10],
+      zoom: 1.2,
+      minZoom: 0.5,
       maxZoom: 14,
-      worldCopyJump: true,
-      gestureHandling: true,
-      gestureHandlingOptions: {
-        text: {
-          touch: 'Use two fingers to move the map',
-          scroll: 'Use ctrl + scroll to zoom the map',
-          scrollMac: 'Use ⌘ + scroll to zoom the map'
-        }
-      },
-    }).setView([5, 0], 2)
-    showBackground(activeLayer.value)
-    map.value.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>')
-    map.value.on('zoomend', () => {
-      zoom.value = map.value.getZoom()
-      layoutMarkers()
+      maxPitch: 0,
+      dragRotate: false,
+      attributionControl: false, // credits are shown below the map controls
+      cooperativeGestures: true, // ctrl / ⌘ + scroll to zoom, two fingers to move on phones
+      locale: {
+        'CooperativeGesturesHandler.WindowsHelpText': 'Use Ctrl + scroll to zoom the map',
+        'CooperativeGesturesHandler.MacHelpText': 'Use ⌘ + scroll to zoom the map',
+        'CooperativeGesturesHandler.MobileHelpText': 'Use two fingers to move the map'
+      }
     })
-    map.value.on('click', closePanel)
-
-    // leader lines and true-position dots go below every bar
-    map.value.createPane('siteLeaders').style.zIndex = 590
-    markerLayer = L.layerGroup().addTo(map.value)
-
+    map.value.touchZoomRotate.disableRotation()
+    map.value.keyboard.disableRotation()
+    // each background style replaces the previous one: apply the globe again
+    map.value.on('style.load', () => map.value.setProjection(PROJECTION))
+    map.value.on('zoom', () => {
+      zoom.value = map.value.getZoom()
+    })
+    map.value.on('moveend', layoutMarkers)
+    map.value.on('click', (event) => {
+      if (!event.originalEvent.target.closest('.site-marker')) closePanel()
+    })
+    await new Promise((resolve) => map.value.once('load', resolve))
     zoom.value = map.value.getZoom()
     renderMarkers()
-    fitAll()
+    showGlobe({ animate: false })
     // the site names use a web font: lay out again once it is loaded
     document.fonts && document.fonts.ready.then(() => { labelWidths.clear(); layoutMarkers() })
   } catch (e) {
@@ -423,6 +454,8 @@ $light: #F3F5E5;
 // The marker element itself sits on the site's true position (BAR size, centred);
 // .site-marker-body is moved by layoutMarkers() when bars would overlap.
 .site-marker {
+  width: 20px; // BAR in the script
+  height: 6px;
   background: none;
   border: 0;
   overflow: visible;
@@ -434,6 +467,8 @@ $light: #F3F5E5;
 
   &:focus-visible { outline: none; }
   &:focus-visible .site-bar { outline: 2px solid $navy; outline-offset: 2px; }
+  // a hovered or selected site comes above its neighbours
+  &:hover, &:focus-visible, &.selected { z-index: 2; }
 }
 .site-marker-body {
   position: absolute;
@@ -488,6 +523,8 @@ $light: #F3F5E5;
   transition: width 0.25s ease-out, transform 0.25s ease-out;
 }
 .site-leader {
+  width: 20px; // BAR in the script
+  height: 6px;
   background: none;
   border: 0;
   overflow: visible;
@@ -778,13 +815,30 @@ $light: #F3F5E5;
   font-size: 14px;
 }
 
-// Leaflet's own attribution and gesture message, in the site's style
-.sites-map .leaflet-control-attribution {
-  font-family: "Lato-Regular", sans-serif;
-  font-size: 11px;
+// sites on the far side of the globe
+.sites-map .maplibregl-marker-covered {
+  visibility: hidden;
 }
-.sites-map .leaflet-gesture-handling:after {
+
+.sites-map-credits {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  margin: 0;
+  padding: 2px 6px;
+  max-width: calc(100% - 12px);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  line-height: 1.4;
+  color: $navy;
+  a { color: $navy; }
+}
+
+// MapLibre's "use ctrl + scroll" message, in the site's font
+.sites-map .maplibregl-cooperative-gesture-screen {
   font-family: "Lato-Regular", sans-serif;
+  z-index: 550;
 }
 
 // ---------- small screens: panel becomes a bottom sheet ----------

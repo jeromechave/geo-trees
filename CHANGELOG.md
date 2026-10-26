@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.0 (2026-10-25)
+
+### Changed
+- The sites map is a globe instead of a flat Mercator map: at world scale, tropical
+  and polar areas are shown at their true relative size; zooming in flattens it into
+  a usual map. It opens on the whole globe, turned to the side with the most sites
+  (a globe shows one hemisphere at a time); sites on the far side are hidden until
+  the globe is turned. Search and "Show on map" turn the globe to the site.
+- The map is drawn by MapLibre GL alone (it was Leaflet with MapLibre drawing the
+  background): same bars, non-overlapping layout, panel, search, legend, background
+  switch and links to the directory. The layout is recalculated after every move,
+  since turning a globe moves sites relative to each other.
+- "Ctrl / ⌘ + scroll to zoom" and "two fingers to move" now come with MapLibre.
+- The map credits are shown as plain links under the map.
+
+### Removed
+- Leaflet, leaflet-gesture-handling (unmaintained since 2022) and
+  maplibre-gl-leaflet: the site now has two runtime dependencies, Vue and MapLibre.
+- The OpenStreetMap fallback for browsers without WebGL: such browsers (rare) get
+  a message, and the site directory still works.
+
 ## 2.0.19 (2026-10-25)
 
 ### Removed

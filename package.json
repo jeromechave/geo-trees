@@ -1,6 +1,6 @@
 {
   "name": "geo-trees",
-  "version": "2.0.19",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -15,9 +15,6 @@
     "snapshot": "node scripts/snapshot-sheet.js"
   },
   "dependencies": {
-    "@maplibre/maplibre-gl-leaflet": "0.1.4",
-    "leaflet": "1.9.4",
-    "leaflet-gesture-handling": "1.2.2",
     "maplibre-gl": "6.13.0",
     "vue": "3.5.43"
   },

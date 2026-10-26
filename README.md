@@ -43,6 +43,15 @@ of a domain instead, run `VITE_BASE=/ npm run build`.
 The map on the Sites page is part of this site (`src/components/SitesMap.vue`).
 It replaces the separate map previously embedded from `geo-trees.org/carto/`.
 
+The map is drawn by MapLibre GL as a **globe**: at world scale areas keep their true
+proportions (unlike the flat Mercator map, which inflates them towards the poles),
+and it flattens into a usual map as one zooms in. It opens on the whole globe,
+turned to the side with the most sites; dragging turns it, and sites on the far
+side are hidden until they come into view. "Show on map" and the search turn the
+globe to the site. Zooming with the mouse wheel needs Ctrl (⌘ on a Mac) and moving
+the map on a phone needs two fingers, so that scrolling the page is not caught by
+the map.
+
 **Data.** The map and the site directory below it both read the `Data` tab of the
 Google Sheet, one row per site:
 
@@ -98,7 +107,8 @@ Liberty style: free and open, with no account, no API key and no usage limits.
 It is a vector map drawn by MapLibre GL, which loads only on the Sites page. To
 try another OpenFreeMap style (`positron`, `bright`), set
 `VITE_OPENFREEMAP_STYLE=https://tiles.openfreemap.org/styles/positron` in
-`.env.local`. Browsers without WebGL (rare) get OpenStreetMap's standard map instead.
+`.env.local`. Browsers without WebGL (rare) cannot show the map; they get a message,
+and the site directory below it still works.
 
 "Satellite" is [EOX's Sentinel-2 cloudless](https://cloudless.eox.at) mosaic
 of 2024, also with no account or API key. Its licence (CC BY-NC-SA 4.0 for the

@@ -23,42 +23,37 @@ export const sheetImage = (name) => SHEET_IMAGE_BASE + name
 // no usage limits (https://openfreemap.org). It is a vector map drawn with MapLibre GL.
 // Other OpenFreeMap styles: https://tiles.openfreemap.org/styles/positron, .../bright
 const OPENFREEMAP_STYLE = import.meta.env.VITE_OPENFREEMAP_STYLE || 'https://tiles.openfreemap.org/styles/liberty'
-const OPENFREEMAP_ATTRIBUTION =
-  '<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> ' +
-  '© <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> ' +
-  'Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+// Credits shown on the map; each background's data providers require them
+const OPENFREEMAP_CREDITS = [
+  { text: 'OpenFreeMap', url: 'https://openfreemap.org' },
+  { text: '© OpenMapTiles', url: 'https://www.openmaptiles.org/' },
+  { text: 'Data from OpenStreetMap', url: 'https://www.openstreetmap.org/copyright' }
+]
 
 // "Satellite" is EOX's Sentinel-2 cloudless mosaic (https://cloudless.eox.at):
 // free with attribution, no account or API key. The 2018 and later years are licensed
 // CC BY-NC-SA 4.0, i.e. for non-commercial use only. 10 m imagery, sharp up to
-// regional scale; tiles exist up to zoom 14 and are enlarged beyond that.
+// regional scale; tiles exist up to zoom 14.
 // Another year (2020 to 2024) can be chosen with VITE_EOX_YEAR in .env.local.
 const EOX_YEAR = import.meta.env.VITE_EOX_YEAR || '2024'
-const EOX_ATTRIBUTION =
-  '<a href="https://cloudless.eox.at" target="_blank" rel="noopener">EOxCloudless</a> by ' +
-  '<a href="https://eox.at" target="_blank" rel="noopener">EOX IT Services GmbH</a> ' +
-  `(Contains modified Copernicus Sentinel data ${EOX_YEAR})`
+const EOX_CREDITS = [
+  { text: 'EOxCloudless', url: 'https://cloudless.eox.at' },
+  { text: 'by EOX IT Services GmbH', url: 'https://eox.at' },
+  { text: `(Contains modified Copernicus Sentinel data ${EOX_YEAR})` }
+]
 
 // type "vector": a MapLibre style URL; type "raster": a {z}/{x}/{y} tile URL
 export const MAP_LAYERS = [
-  { id: 'outdoors', label: 'Outdoors', type: 'vector', style: OPENFREEMAP_STYLE, attribution: OPENFREEMAP_ATTRIBUTION },
+  { id: 'outdoors', label: 'Outdoors', type: 'vector', style: OPENFREEMAP_STYLE, credits: OPENFREEMAP_CREDITS },
   {
     id: 'satellite',
     label: 'Satellite',
     type: 'raster',
     url: `https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-${EOX_YEAR}_3857/default/g/{z}/{y}/{x}.jpg`,
-    attribution: EOX_ATTRIBUTION,
-    maxNativeZoom: 14
+    maxZoom: 14,
+    credits: EOX_CREDITS
   }
 ]
-
-// Used instead of a vector layer in the rare browsers without WebGL
-export const MAP_FALLBACK_LAYER = {
-  type: 'raster',
-  url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',
-  maxZoom: 19
-}
 
 // Colours shared by the measurement squares and the status filters.
 // Each state is also shown by how full its square is (empty, half, full), so it can
