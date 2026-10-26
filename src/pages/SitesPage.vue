@@ -2,7 +2,7 @@
   <SiteHeader />
   <div id="content">
 
-    <div class="content-section section-dark">
+    <div class="content-section section-dark sites-banner">
       <div class="content-wrapper">
         <h1>Biomass Reference Measurement Sites</h1>
       </div>
@@ -161,9 +161,15 @@ function showOnMap(site) {
 #app {
   #content{
     .content-section{
-      // same placement as the previous embedded map (overlaps the next section by 60px)
-      .sites-map{
-        top: 60px;
+      // a slim title band: the map starts right below the title
+      &.sites-banner{
+        padding-bottom: 0;
+        .content-wrapper:first-child{
+          padding-top: 30px;
+        }
+        h1{
+          margin-bottom: 20px;
+        }
       }
       .content-wrapper{
         .sites-repertory{

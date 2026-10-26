@@ -276,16 +276,31 @@ function renderMarkers() {
 
 // ---------- view ----------
 
+// Opening view: from 60°S to 60°N (further if a site lies beyond), across all sites
+const VIEW_LATITUDE = 60
+
 function fitAll({ animate = true } = {}) {
   if (!map.value || sites.value.length === 0) return
   const bounds = new maplibregl.LngLatBounds()
   sites.value.forEach((site) => bounds.extend([site.lon, site.lat]))
-  const small = mapElement.value.clientWidth < 500
-  const padding = small ? 25 : 40
-  // leave room at the top for the search box and legend, where the map is tall enough
-  const toolbar = mapElement.value.parentElement.querySelector('.sites-map-toolbar')
-  const top = small ? padding : Math.max(padding, toolbar.offsetTop + toolbar.offsetHeight + 15)
-  map.value.fitBounds(bounds, { padding: { top, bottom: padding, left: padding, right: padding }, maxZoom: 8, animate })
+  bounds.extend([bounds.getWest(), -VIEW_LATITUDE]).extend([bounds.getEast(), VIEW_LATITUDE])
+  const padding = mapElement.value.clientWidth < 500 ? 25 : 40
+  map.value.fitBounds(bounds, { padding, maxZoom: 8, animate })
+  // if a site ends up under the search box or legend, fit again below them
+  const check = () => {
+    const toolbar = mapElement.value.parentElement.querySelector('.sites-map-toolbar')
+    const boxes = [...toolbar.children].map((element) => element.getBoundingClientRect())
+    const hidden = [...markers.values()].some(({ marker }) => {
+      const bar = marker.getElement().querySelector('.site-bar').getBoundingClientRect()
+      return boxes.some((box) => bar.left < box.right && bar.right > box.left && bar.top < box.bottom && bar.bottom > box.top)
+    })
+    if (hidden) {
+      const top = toolbar.offsetTop + toolbar.offsetHeight + 15
+      map.value.fitBounds(bounds, { padding: { top, bottom: padding, left: padding, right: padding }, maxZoom: 8, animate: false })
+    }
+  }
+  if (animate) map.value.once('moveend', () => requestAnimationFrame(check))
+  else requestAnimationFrame(check)
 }
 
 function resetView() {

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.2 (2026-10-25)
+
+### Changed
+- Sites page: slimmer title band; the map starts right below the title (the dark
+  band above the map goes from about 240 to 100 px).
+- The map opens on latitudes 60°S to 60°N (with a small margin), across all sites;
+  "Show all sites" returns to this view. On narrow screens, where all sites must fit
+  side by side, it shows more latitude. If a site would lie under the search box or
+  legend, the view is fitted below them.
+
 ## 2.1.1 (2026-10-25)
 
 ### Changed

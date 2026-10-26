@@ -47,7 +47,7 @@ The map is a flat map in the Mercator projection, the web standard, drawn by
 MapLibre GL: one continuous zoom from the whole world to a site, with both
 background maps. Like every Mercator map it enlarges areas towards the poles (about
 2× at 45° of latitude), so at world scale the tropics, where most sites are, look
-smaller than they are. It opens on all sites; zooming with the mouse wheel needs
+smaller than they are. It opens on latitudes 60°S to 60°N, across all sites; zooming with the mouse wheel needs
 Ctrl (⌘ on a Mac) and moving the map on a phone needs two fingers, so that
 scrolling the page is not caught by the map.
 
