@@ -10,7 +10,7 @@ export const SHEET_TABS = sheet.tabs
 export { SHEET_COLUMNS } from './sheet-layout.js'
 
 // Where the images named in the spreadsheet (people, partner logos) are hosted
-export const SHEET_IMAGE_BASE = 'https://geo-trees.org/geo-trees/img/'
+const SHEET_IMAGE_BASE = 'https://geo-trees.org/geo-trees/img/'
 
 export const sheetImage = (name) => SHEET_IMAGE_BASE + name
 

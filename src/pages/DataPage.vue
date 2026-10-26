@@ -6,7 +6,7 @@
       <div class="content-wrapper">
         <h1>Forest Plot Biomass data</h1>
         <h2>Data portal</h2>
-        <span class="default-text">DATA.GEO-TREES is the data portal of the GEO-TREES initiative. Access data here : <a href="https://data.geo-trees.org/" target="_blank">data.geo-trees.org</a></span>
+        <span class="default-text">DATA.GEO-TREES is the data portal of the GEO-TREES initiative. Access data here : <a href="https://data.geo-trees.org/" target="_blank" rel="noopener">data.geo-trees.org</a></span>
       </div>
     </div>
 

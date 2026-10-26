@@ -30,7 +30,9 @@ Then open http://localhost:5173. Other commands:
 - `src/lib/sheets.js` reads the Google Sheet tabs and turns rows into objects.
 - `src/config.js` spreadsheet id, API key and where sheet images are hosted.
 - `src/styles/` fonts and the styles shared by all pages.
-- `public/` files copied as they are to the root of the site (logos, photos, PDFs).
+- `public/` files published as they are at the root of the site (`icon.png`, a PDF).
+- `scripts/snapshot-sheet.js` saves the fallback copy of the sheet at each build.
+- `.github/` the automatic checks (GitHub Actions) and dependency updates (Dependabot).
 - `pages.config.js` the list of pages. To add one, follow the comment in that file.
 
 The site is built for `https://geo-trees.org/geo-trees/`. To build it for the root
@@ -139,25 +141,39 @@ npm run deploy
 
 This builds the site and commits the result on top of the `gh-pages` branch, then
 pushes it (no force push). Files already on `gh-pages` that the build does not
-produce, such as images uploaded through GitHub, are **kept** and listed in the
+produce (for example files from an older version) are **kept** and listed in the
 output. To remove them, run `npm run deploy -- --clean`.
 
 The script works in a temporary folder, so it does not touch your working copy.
 
-## Adding an image (logo, photo)
+## Adding an image
 
-Preferred: put the file in `public/`, commit it to `master`, and run `npm run deploy`.
-The file then lives with the source and is published at the root of `gh-pages`.
+Where an image goes depends on the page that shows it.
 
-Without a local setup, you can still upload it directly to `gh-pages`:
+**About us (people's photos, partner logos).** These images are not part of this
+project. The `image` column of the `Aboutus` tab gives a file name, and the site
+loads that file from `https://geo-trees.org/geo-trees/img/` (`SHEET_IMAGE_BASE` in
+`src/config.js`). To add one:
 
-1. On GitHub, switch from `master` to the `gh-pages` branch.
-2. Click **Add file** → **Upload files** and drop the image.
-3. Commit directly to the `gh-pages` branch.
-4. Check **Settings** → **Pages** for the last deployment date.
+1. Resize it: about 400 px on its longest side for a photo, 800 px for a logo
+   (twice the displayed size, for high-resolution screens). Larger files only make
+   the page slower.
+2. Give it a simple name: no spaces or accents (e.g. `Logo_Sites_Gabon_ANPN.png`).
+   Names are case-sensitive.
+3. Upload it to the `geo-trees/img/` folder on the geo-trees.org server.
+4. Write its exact file name in the `image` column of its row.
 
-Deployments keep files uploaded this way, but please also add them to `public/`
-afterwards so they are not lost if someone deploys with `--clean`.
+It appears at the next page load, without rebuilding the site.
+
+**News.** Put the image's full web address in the `Img_url` column of the `News` tab.
+It can be on any site; only `https://` and `http://` addresses are used.
+
+**The site's own pages** (homepage background, Project page illustrations). Put the
+file in `src/assets/`, refer to it from the page's template as `@/assets/<name>`,
+then build and deploy. The build copies it into `img/`.
+
+**`public/`** is only for files that need a fixed address (`icon.png`, the terms and
+conditions PDF linked from the Data page). Anything put there is published as is.
 
 ## Google Sheet
 

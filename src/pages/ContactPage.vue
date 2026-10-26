@@ -5,7 +5,7 @@
     <div class="content-section section-dark">
       <div class="content-wrapper">
         <h1>Contact</h1>
-        <span class="default-text">If you are a potential partner and would like to get in touch with us, please fill <a target="_blank" href="https://docs.google.com/forms/d/12L34uFxsfd5fSwww2e-IG6tytRshdQn0YhG44Xel7U8/viewform?edit_requested=true&pli=1">this form.</a></span>
+        <span class="default-text">If you are a potential partner and would like to get in touch with us, please fill <a target="_blank" rel="noopener" href="https://docs.google.com/forms/d/12L34uFxsfd5fSwww2e-IG6tytRshdQn0YhG44Xel7U8/viewform?edit_requested=true&pli=1">this form.</a></span>
         <span class="default-text">For any other request, you can contact us by mail at <a href="mailto:contact@geo-trees.org">contact@geo-trees.org</a>.</span>
       </div>
     </div>
@@ -15,7 +15,7 @@
         <h2>Download our terms of reference</h2>
         <span class="default-text">Date : 15/07/2025. This is an evolving document and we are happy to discuss this with partners.</span>
         <div class="link-container">
-          <a v-for="file in termsOfReference" :key="file.url" class="link-text" :href="file.url" download target="_blank">
+          <a v-for="file in termsOfReference" :key="file.url" class="link-text" :href="file.url" download target="_blank" rel="noopener">
             <svg viewBox="0 0 512 512" aria-hidden="true"><path :d="downloadIcon" /></svg>
             {{ file.label }}
           </a>
@@ -23,7 +23,7 @@
         <h2>Download our code of conduct </h2>
         <span class="default-text">Date : 15/04/2026.</span>
         <div class="link-container">
-          <a v-for="file in codeOfConduct" :key="file.url" class="link-text" :href="file.url" download target="_blank">
+          <a v-for="file in codeOfConduct" :key="file.url" class="link-text" :href="file.url" download target="_blank" rel="noopener">
             <svg viewBox="0 0 512 512" aria-hidden="true"><path :d="downloadIcon" /></svg>
             {{ file.label }}
           </a>

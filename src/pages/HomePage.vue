@@ -19,23 +19,10 @@
           <span>The Terms of Reference of the GEO-TREES initiative are available <a href="https://geo-trees.org/contact.html">here</a>.</span>
         </div>
         <div class="homepage-intro">
-          <span>GEO-TREES implements the recommendations of the <a href="https://lpvs.gsfc.nasa.gov/AGB/AGB_home.html" target="_blank">CEOS Aboveground Biomass Land Product Validation protocol</a>.</span>
+          <span>GEO-TREES implements the recommendations of the <a href="https://lpvs.gsfc.nasa.gov/AGB/AGB_home.html" target="_blank" rel="noopener">CEOS Aboveground Biomass Land Product Validation protocol</a>.</span>
         </div>
       </div>
     </div>
-    <!-- <div class="content-section news-section">
-      <div class="content-wrapper">
-        <h3 class="news-title">NEWS</h3>
-        <div class="news-item" v-for="news in newsData" :key="news.title">
-          <div class="news-item-title">{{ news.title }}</div>
-          <div class="news-item-date">{{ news.date }}</div>
-          <div class="news-item-text">{{ news.text }}</div>
-          <div class="news-item-link">
-            <template v-for="(link, i) in news.links" :key="i"><a v-if="link.url" :href="link.url" target="_blank" rel="noopener">{{ link.name }}</a><span v-else>{{ link.name }}</span></template>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -51,10 +38,6 @@ import SiteHeader from '@/components/SiteHeader.vue'
     background-color: #f4f7e4;
     .content-section{
       position: relative;
-      &.news-section{
-        background-color: #fff;
-        padding-top: 0px;
-      }
       &.homepage-banner{
         background-image: url("@/assets/homepage-background.jpg");
         background-size: cover;
@@ -108,57 +91,6 @@ import SiteHeader from '@/components/SiteHeader.vue'
                 text-decoration: underline;
               }
             }
-          }
-        }
-      }
-      .news-title{
-        display: inline-block;
-        text-align: left;
-        font-size: 35px;
-        color: #213043;
-        font-family: "Lato-Bold";
-        padding: 10px 20px;
-        line-height: 1.75;
-        margin-bottom: 10px;
-      }
-      .news-item{
-        display: inline-block;
-        text-align: left;
-        padding: 20px 20px;
-        .news-item-date{
-          font-size: 14px;
-          color: #213043;
-          font-family: "Lato-Regular";
-          margin-bottom: 10px;
-        }
-      }
-      .news-item-title{
-        font-size: 17px;
-        color: #213043;
-        font-family: "Lato-Bold";
-        margin-bottom: 15px;
-      }
-      .news-item-text{
-        font-size: 17px;
-        color: #213043;
-        font-family: "Lato-Regular";
-        margin-bottom: 10px;
-        line-height: 1.75;
-        display: inline;
-      }
-      .news-item-link{
-        font-size: 17px;
-        color: #213043;
-        font-family: "Lato-Regular";
-        margin-bottom: 10px;
-        display: inline;
-        a{
-          color: #53A034;
-          text-decoration: none;
-          display: inline;
-          margin-left: 10px;
-          &:hover{
-            text-decoration: underline;
           }
         }
       }

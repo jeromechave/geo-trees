@@ -57,7 +57,7 @@
 
         <h2>Network Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link || null"  target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a :style="{'width': member.zoom+'%'}" class="partner-logo" v-for="(member, position) in networksPartners" :key="position" :href="member.link || null"  target="_blank" rel="noopener"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <!-- Community: hidden for now, kept for a later release (see SHOW_COMMUNITY below) -->
@@ -78,12 +78,12 @@
         <h2>Site Partners</h2>
         <a href="https://geo-trees.org/sites.html">More information about the sites</a>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="(member, position) in sitePartners" :key="position" :href="member.link || null" target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in sitePartners" :key="position" :href="member.link || null" target="_blank" rel="noopener"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
         <h2>Supporting Partners</h2>
         <div class="partners-logo-list x-small-logo">
-          <a class="partner-logo" v-for="(member, position) in supportingPartners" :key="position" :href="member.link || null" target="_blank"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
+          <a class="partner-logo" v-for="(member, position) in supportingPartners" :key="position" :href="member.link || null" target="_blank" rel="noopener"><img loading="lazy" decoding="async" :src="sheetImage(member.image)" :alt="member.name"/></a>
         </div>
 
       </div>
@@ -166,9 +166,6 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
             margin: 0 auto;
             border:3px solid #53A034;
             box-sizing: border-box;
-            &.no-border{
-              border:none;
-            }
             img{
               width: 100%;
               height: auto;
@@ -221,9 +218,6 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
             margin: 0 auto;
             border:3px solid #53A034;
             box-sizing: border-box;
-            &.no-border{
-              border:none;
-            }
             img{
               width: 100%;
               height: auto;
@@ -265,12 +259,6 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
               object-fit: contain;
             }
           }
-          &.small-logo{
-            .partner-logo{
-              width: 12%;
-              height: 125px;
-            }
-          }
           &.x-small-logo{
             .partner-logo{
               width: 12%;
@@ -293,11 +281,6 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
       .content-section{
         .content-wrapper{
           .partners-logo-list{
-            &.small-logo{
-              .partner-logo{
-                width: 15%;
-              }
-            }
             &.x-small-logo{
               .partner-logo{
                 width: 15%;
@@ -340,11 +323,6 @@ const splitList = splitItems // "a; b" -> ['a', 'b']
         .partners-logo-list{
           .partner-logo{
             width: 28%;
-          }
-          &.small-logo{
-            .partner-logo{
-              width: 28%;
-            }
           }
           &.x-small-logo{
             .partner-logo{

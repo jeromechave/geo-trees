@@ -57,16 +57,3 @@ export function repel(items, { gap = 3, iterations = 120, pull = 0.08, maxCleanu
 
   return positions.map((position, i) => ({ dx: position.x - items[i].x, dy: position.y - items[i].y }))
 }
-
-// True if any two boxes (after moving them) overlap. Used by the tests.
-export function hasOverlap(items, offsets, gap = 0) {
-  for (let i = 0; i < items.length; i++) {
-    for (let j = i + 1; j < items.length; j++) {
-      const dx = items[j].x + offsets[j].dx - (items[i].x + offsets[i].dx)
-      const dy = items[j].y + offsets[j].dy - (items[i].y + offsets[i].dy)
-      if (Math.abs(dx) < (items[i].width + items[j].width) / 2 + gap - EPSILON &&
-          Math.abs(dy) < (items[i].height + items[j].height) / 2 + gap - EPSILON) return true
-    }
-  }
-  return false
-}

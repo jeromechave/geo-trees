@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.0.19 (2026-10-25)
+
+### Removed
+- 150 unused files from `public/` (5 MB): 139 old uploads of logos and photos (the
+  About page loads them from geo-trees.org) and 11 copies of `src/assets` images.
+  `public/` now holds only `icon.png` and the terms and conditions PDF.
+- Dead code: the hidden news block of the home page and its styles, an unused test
+  helper (`hasOverlap`), three unused style rules.
+
+### Changed
+- README: the image instructions describe where each kind of image really goes
+  (About us images on the geo-trees.org server, news images by address, page images
+  in `src/assets`).
+- Every link opening a new tab has `rel="noopener"`.
+
+### Added
+- Dependabot (`.github/dependabot.yml`): weekly pull requests for npm and GitHub
+  Actions updates, a week after their release, checked by GitHub Actions before
+  being merged.
+
 ## 2.0.18 (2026-10-25)
 
 ### Added
