@@ -123,7 +123,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['sites-loaded', 'show-in-directory'])
 
-const LABEL_ZOOM = 5 // site names appear from this zoom level
+// Site names appear from this zoom level: a regional view (about 80° of longitude
+// across a desktop map), where names fit with little displacement of the bars
+const LABEL_ZOOM = 3.5
 
 // Size of a site's bar in pixels (keep in sync with .site-bar in the styles)
 // 3 squares of 6 px with 1 px between them (no frame)

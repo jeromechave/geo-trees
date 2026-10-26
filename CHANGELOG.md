@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.3 (2026-10-25)
+
+### Changed
+- Sites map: site names appear from a regional view (zoom 3.5, about 80° of
+  longitude across a desktop map) instead of zoom 5. At that scale names fit with
+  little displacement of the bars, also in the densest regions (India, South-East
+  Asia).
+
 ## 2.1.2 (2026-10-25)
 
 ### Changed
