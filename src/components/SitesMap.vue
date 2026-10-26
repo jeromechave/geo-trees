@@ -144,6 +144,7 @@ const activeLayer = ref(MAP_LAYERS[0].id)
 const zoom = ref(0)
 
 let maplibregl
+let resizeObserver
 const markers = new Map() // site.id -> { site, marker, leaderMarker }
 
 const stateOf = (site, measurement) => MEASUREMENT_STATES.find((state) => state.id === site.measurements[measurement.id])
@@ -380,6 +381,9 @@ onMounted(async () => {
         'CooperativeGesturesHandler.MobileHelpText': 'Use two fingers to move the map'
       }
     })
+    // keep the map's drawing size in step with its frame (fonts, layout changes)
+    resizeObserver = new ResizeObserver(() => map.value && map.value.resize())
+    resizeObserver.observe(mapElement.value)
     map.value.touchZoomRotate.disableRotation()
     map.value.keyboard.disableRotation()
     // each background style replaces the previous one: apply the globe again
@@ -406,6 +410,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  if (resizeObserver) resizeObserver.disconnect()
   if (map.value) map.value.remove()
 })
 </script>
@@ -426,6 +431,10 @@ $light: #F3F5E5;
 
 .sites-map {
   position: relative;
+  // nothing drawn by the map (site bars, names, lines) may show outside its frame;
+  // isolation keeps the map's layers from mixing with the rest of the page
+  overflow: hidden;
+  isolation: isolate;
   height: clamp(460px, 72vh, 640px);
   font-family: "Lato-Regular", sans-serif;
   color: $navy;
@@ -446,6 +455,7 @@ $light: #F3F5E5;
 .sites-map-canvas {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   z-index: 0;
   background: #dfe5d8;
 }

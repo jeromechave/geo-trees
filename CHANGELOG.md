@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.1 (2026-10-25)
+
+### Fixed
+- Sites map: site bars, names and lines no longer show outside the map's frame
+  (some browsers drew sites beyond its edge, over the page's title band). The map
+  also follows any change of its frame's size.
+
 ## 2.1.0 (2026-10-25)
 
 ### Changed
