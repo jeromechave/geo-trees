@@ -17,6 +17,13 @@
       </div>
     </div>
 
+    <div class="content-section section-dark">
+      <div class="content-wrapper">
+        <h2>GEO-TREES computing resources</h2>
+        <span class="default-text">The code developed by the GEO-TREES initiative is available here : <a href="https://github.com/GEO-TREES" target="_blank" rel="noopener">github.com/GEO-TREES</a></span>
+      </div>
+    </div>
+
       
 
   </div>

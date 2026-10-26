@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.5 (2026-10-26)
+
+### Added
+- Data page: a "GEO-TREES computing resources" section below Data Sharing, with a
+  link to the initiative's code on GitHub (https://github.com/GEO-TREES).
+
 ## 2.1.4 (2026-10-25)
 
 ### Changed
