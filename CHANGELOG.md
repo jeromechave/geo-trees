@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.4 (2026-10-25)
+
+### Changed
+- Sites map: site names appear from zoom 3 (about 110° of longitude across a
+  desktop map, 34° on a phone) instead of 3.5. In dense regions (India, South-East
+  Asia) names stack in columns, linked to their sites by thin lines.
+
 ## 2.1.3 (2026-10-25)
 
 ### Changed

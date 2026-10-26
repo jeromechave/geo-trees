@@ -123,9 +123,10 @@ const props = defineProps({
 })
 const emit = defineEmits(['sites-loaded', 'show-in-directory'])
 
-// Site names appear from this zoom level: a regional view (about 80° of longitude
-// across a desktop map), where names fit with little displacement of the bars
-const LABEL_ZOOM = 3.5
+// Site names appear from this zoom level: a regional view (about 110° of longitude
+// across a desktop map). Lower values show names on wider views, at the cost of
+// bars pushed further from their sites in dense regions (India, South-East Asia).
+const LABEL_ZOOM = 3
 
 // Size of a site's bar in pixels (keep in sync with .site-bar in the styles)
 // 3 squares of 6 px with 1 px between them (no frame)
