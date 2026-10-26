@@ -58,7 +58,7 @@
     <div class="sites-map-controls">
       <button type="button" aria-label="Zoom in" @click="map && map.zoomIn()">+</button>
       <button type="button" aria-label="Zoom out" @click="map && map.zoomOut()">−</button>
-      <button type="button" aria-label="Show the whole globe" class="reset" @click="resetView">
+      <button type="button" aria-label="Show all sites" class="reset" @click="resetView">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -165,10 +165,6 @@ const searchResults = computed(() => {
 
 // ---------- background maps ----------
 
-// The globe is shown at world scale and becomes a flat map as one zooms in, so
-// areas are not inflated towards the poles as on a flat Mercator world map.
-const PROJECTION = { type: 'globe' }
-
 function styleFor(layer) {
   if (layer.type === 'vector') return layer.style
   return {
@@ -232,14 +228,11 @@ function labelWidth(site) {
   return labelWidths.get(site.id)
 }
 
-// Sites on the far side of the globe are hidden by MapLibre (class added below)
-const isHidden = (marker) => marker.getElement().classList.contains('maplibregl-marker-covered')
-
-// Moves bars apart so that none overlap (see lib/repel.js). On a globe, positions
-// change when it turns as well as when zooming, so this runs after every move.
+// Moves bars apart so that none overlap (see lib/repel.js). On a flat map only zooming
+// changes the distances between sites on screen, so this runs after every zoom.
 function layoutMarkers() {
   if (!map.value || markers.size === 0) return
-  const entries = [...markers.values()].filter(({ marker }) => !isHidden(marker))
+  const entries = [...markers.values()]
   const withLabels = showLabels.value
   const items = entries.map(({ site }) => {
     const point = map.value.project([site.lon, site.lat])
@@ -268,7 +261,7 @@ function renderMarkers() {
     leaderMarker.remove()
   })
   markers.clear()
-  const options = { anchor: 'center', opacityWhenCovered: '0', subpixelPositioning: true }
+  const options = { anchor: 'center', subpixelPositioning: true }
   // all leaders first, so that every bar is drawn above every leader
   sites.value.forEach((site) => {
     const leaderMarker = new maplibregl.Marker({ ...options, element: leaderElement() }).setLngLat([site.lon, site.lat]).addTo(map.value)
@@ -283,39 +276,21 @@ function renderMarkers() {
 
 // ---------- view ----------
 
-// A globe shows one hemisphere at a time: turn it to the side with the most sites
-function bestCenter() {
-  const radians = (degrees) => (degrees * Math.PI) / 180
-  const lat = sites.value.reduce((sum, site) => sum + site.lat, 0) / (sites.value.length || 1)
-  let best = { lon: 0, count: -1 }
-  for (let lon = -180; lon < 180; lon += 5) {
-    // sites less than 80° away (along the globe) from this centre are well in view
-    const count = sites.value.filter((site) => {
-      const cos = Math.sin(radians(lat)) * Math.sin(radians(site.lat)) +
-        Math.cos(radians(lat)) * Math.cos(radians(site.lat)) * Math.cos(radians(site.lon - lon))
-      return cos > Math.cos(radians(80))
-    }).length
-    if (count > best.count) best = { lon, count }
-  }
-  return [best.lon, lat]
-}
-
-// Zoom at which the whole globe fits in the map, with a margin
-function globeZoom() {
-  const size = Math.min(mapElement.value.clientWidth, mapElement.value.clientHeight)
-  return Math.log2((0.42 * size * 2 * Math.PI) / 512)
-}
-
-function showGlobe({ animate = true } = {}) {
-  if (!map.value) return
-  const view = { center: bestCenter(), zoom: globeZoom() }
-  if (animate) map.value.easeTo({ ...view, duration: 1000 })
-  else map.value.jumpTo(view)
+function fitAll({ animate = true } = {}) {
+  if (!map.value || sites.value.length === 0) return
+  const bounds = new maplibregl.LngLatBounds()
+  sites.value.forEach((site) => bounds.extend([site.lon, site.lat]))
+  const small = mapElement.value.clientWidth < 500
+  const padding = small ? 25 : 40
+  // leave room at the top for the search box and legend, where the map is tall enough
+  const toolbar = mapElement.value.parentElement.querySelector('.sites-map-toolbar')
+  const top = small ? padding : Math.max(padding, toolbar.offsetTop + toolbar.offsetHeight + 15)
+  map.value.fitBounds(bounds, { padding: { top, bottom: padding, left: padding, right: padding }, maxZoom: 8, animate })
 }
 
 function resetView() {
   closePanel()
-  showGlobe()
+  fitAll()
 }
 
 function selectSite(site, { fly = false } = {}) {
@@ -368,8 +343,8 @@ onMounted(async () => {
       container: mapElement.value,
       style: styleFor(MAP_LAYERS[0]),
       center: [0, 10],
-      zoom: 1.2,
-      minZoom: 0.5,
+      zoom: 1.5,
+      minZoom: -1, // low enough for all sites to fit on a phone screen
       maxZoom: 14,
       maxPitch: 0,
       dragRotate: false,
@@ -386,19 +361,17 @@ onMounted(async () => {
     resizeObserver.observe(mapElement.value)
     map.value.touchZoomRotate.disableRotation()
     map.value.keyboard.disableRotation()
-    // each background style replaces the previous one: apply the globe again
-    map.value.on('style.load', () => map.value.setProjection(PROJECTION))
     map.value.on('zoom', () => {
       zoom.value = map.value.getZoom()
     })
-    map.value.on('moveend', layoutMarkers)
+    map.value.on('zoomend', layoutMarkers)
     map.value.on('click', (event) => {
       if (!event.originalEvent.target.closest('.site-marker')) closePanel()
     })
     await new Promise((resolve) => map.value.once('load', resolve))
     zoom.value = map.value.getZoom()
     renderMarkers()
-    showGlobe({ animate: false })
+    fitAll({ animate: false })
     // the site names use a web font: lay out again once it is loaded
     document.fonts && document.fonts.ready.then(() => { labelWidths.clear(); layoutMarkers() })
   } catch (e) {
@@ -825,11 +798,6 @@ $light: #F3F5E5;
   font-size: 14px;
 }
 
-// sites on the far side of the globe
-.sites-map .maplibregl-marker-covered {
-  visibility: hidden;
-}
-
 .sites-map-credits {
   position: absolute;
   right: 0;
@@ -854,7 +822,9 @@ $light: #F3F5E5;
 // ---------- small screens: panel becomes a bottom sheet ----------
 @media screen and (max-width: 700px) {
   .sites-map {
-    height: clamp(480px, 78vh, 620px);
+    // close to square: a flat map cannot zoom out beyond the world's height, so on a
+    // tall narrow map the sites (258° of longitude) would not all fit side by side
+    height: clamp(400px, 112vw, 560px);
   }
   .sites-map-toolbar {
     top: 12px;

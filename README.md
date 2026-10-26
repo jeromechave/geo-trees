@@ -43,14 +43,13 @@ of a domain instead, run `VITE_BASE=/ npm run build`.
 The map on the Sites page is part of this site (`src/components/SitesMap.vue`).
 It replaces the separate map previously embedded from `geo-trees.org/carto/`.
 
-The map is drawn by MapLibre GL as a **globe**: at world scale areas keep their true
-proportions (unlike the flat Mercator map, which inflates them towards the poles),
-and it flattens into a usual map as one zooms in. It opens on the whole globe,
-turned to the side with the most sites; dragging turns it, and sites on the far
-side are hidden until they come into view. "Show on map" and the search turn the
-globe to the site. Zooming with the mouse wheel needs Ctrl (⌘ on a Mac) and moving
-the map on a phone needs two fingers, so that scrolling the page is not caught by
-the map.
+The map is a flat map in the Mercator projection, the web standard, drawn by
+MapLibre GL: one continuous zoom from the whole world to a site, with both
+background maps. Like every Mercator map it enlarges areas towards the poles (about
+2× at 45° of latitude), so at world scale the tropics, where most sites are, look
+smaller than they are. It opens on all sites; zooming with the mouse wheel needs
+Ctrl (⌘ on a Mac) and moving the map on a phone needs two fingers, so that
+scrolling the page is not caught by the map.
 
 **Data.** The map and the site directory below it both read the `Data` tab of the
 Google Sheet, one row per site:

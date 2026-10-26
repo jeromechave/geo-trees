@@ -2,10 +2,17 @@
 
 ## 2.1.1 (2026-10-25)
 
+### Changed
+- The sites map is a flat map again (Mercator projection), as up to 2.0.19, instead
+  of the globe of 2.1.0: all sites are visible at once and the zoom is continuous.
+  It keeps everything else from 2.1.0: drawn by MapLibre alone (no Leaflet), the
+  three-square bars with their non-overlapping layout, panel, search, legend, both
+  backgrounds, built-in gestures and credits.
+
 ### Fixed
-- Sites map: site bars, names and lines no longer show outside the map's frame
-  (some browsers drew sites beyond its edge, over the page's title band). The map
-  also follows any change of its frame's size.
+- Site bars, names and lines no longer show outside the map's frame (some browsers
+  drew sites beyond its edge, over the page's title band). The map also follows any
+  change of its frame's size.
 
 ## 2.1.0 (2026-10-25)
 
