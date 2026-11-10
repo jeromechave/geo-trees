@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "node scripts/snapshot-sheet.js && vite build",
+    "build:www": "node scripts/snapshot-sheet.js && VITE_BASE=/ vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "deploy": "node gh-pages-deploy.js",

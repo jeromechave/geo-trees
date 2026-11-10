@@ -25,7 +25,11 @@ export default defineConfig(({ command }) => ({
         // URLs such as /geo-trees/img/homepage-background.jpg keep working.
         assetFileNames: (asset) => {
           const name = (asset.names && asset.names[0]) || asset.name || ''
-          return imagePattern.test(name) ? 'img/[name][extname]' : 'assets/[name]-[hash][extname]'
+          if (imagePattern.test(name)) return 'img/[name][extname]'
+          // Shared hosts often have no MIME type for .mjs; MapLibre's worker then
+          // fails with "non-JavaScript MIME type". Emit it as .js instead.
+          if (name.endsWith('.mjs')) return 'assets/[name]-[hash].js'
+          return 'assets/[name]-[hash][extname]'
         }
       }
     }

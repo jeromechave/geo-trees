@@ -17,7 +17,8 @@ export function loadMapLibre() {
     const [maplibregl, { default: workerUrl }] = await Promise.all([
       import('maplibre-gl'),
       // MapLibre processes map data in a web worker; once bundled it cannot find
-      // the worker file by itself, so Vite ships it as a file and we pass its URL
+      // the worker file by itself, so Vite ships it as a file and we pass its URL.
+      // The build renames .mjs → .js (see vite.config.js) for hosts without an .mjs MIME type.
       import('maplibre-gl/dist/maplibre-gl-worker.mjs?url')
     ])
     maplibregl.setWorkerUrl(workerUrl)

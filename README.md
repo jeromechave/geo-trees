@@ -35,8 +35,9 @@ Then open http://localhost:5173. Other commands:
 - `.github/` the automatic checks (GitHub Actions) and dependency updates (Dependabot).
 - `pages.config.js` the list of pages. To add one, follow the comment in that file.
 
-The site is built for `https://geo-trees.org/geo-trees/`. To build it for the root
-of a domain instead, run `VITE_BASE=/ npm run build`.
+The default build (`npm run build` / `npm run deploy`) targets the GitHub Pages
+path `/geo-trees/`. To upload `dist/` to the root of `https://www.geo-trees.org/`
+via FTP, run `npm run build:www` instead (same as `VITE_BASE=/ npm run build`).
 
 ## The sites map
 
